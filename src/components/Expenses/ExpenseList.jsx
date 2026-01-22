@@ -104,101 +104,134 @@ const ExpenseList = () => {
 
                 <div className="divide-y divide-slate-800/50 max-h-[400px] overflow-y-auto custom-scrollbar">
                     {expenses.map((expense) => (
-                        <div key={expense.id} className="p-4 hover:bg-white/5 transition-colors flex items-center group">
-                            <CategoryIcon category={expense.category} />
+                        <div key={expense.id} className="p-3 sm:p-4 hover:bg-white/5 transition-colors group">
+                            <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0">
+                                    <CategoryIcon category={expense.category} />
+                                </div>
 
-                            <div className="ml-4 flex-1 min-w-0">
-                                <h4 className="font-medium text-main truncate">{expense.title}</h4>
-                                <div className="flex items-center gap-2">
-                                    <p className="text-xs text-muted">{format(new Date(expense.date), 'dd MMM yyyy')}</p>
-                                    {expense.receiptUrl && (
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0 flex-1">
+                                            <h4 className="font-medium text-sm sm:text-base text-main truncate">{expense.title}</h4>
+                                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+                                                <p className="text-[10px] sm:text-xs text-muted">{format(new Date(expense.date), 'dd MMM yyyy')}</p>
+                                                {expense.receiptUrl && (
+                                                    <button
+                                                        onClick={() => setReceiptModal({ isOpen: true, url: expense.receiptUrl })}
+                                                        className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-medium hover:bg-emerald-500/30 transition-colors"
+                                                    >
+                                                        <ImageIcon size={10} />
+                                                        Struk
+                                                    </button>
+                                                )}
+                                                {expense.username && (
+                                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-medium">
+                                                        @{expense.username}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="text-right flex-shrink-0">
+                                            <p className="font-bold text-sm sm:text-base text-main">-{formatCurrency(expense.amount)}</p>
+                                            <p className="text-[10px] sm:text-xs text-muted">{t(`categories.${expense.category}`) || expense.category}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Action buttons - visible on mobile, hover on desktop */}
+                                    <div className="flex items-center gap-1 mt-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                         <button
-                                            onClick={() => setReceiptModal({ isOpen: true, url: expense.receiptUrl })}
-                                            className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-medium hover:bg-emerald-500/30 transition-colors"
+                                            onClick={() => handleEditClick(expense)}
+                                            className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all text-xs flex items-center gap-1"
+                                            title={t('expenses.editExpense') || 'Edit'}
                                         >
-                                            <ImageIcon size={10} />
-                                            Struk
+                                            <Pencil size={14} />
+                                            <span className="sm:hidden">Edit</span>
                                         </button>
-                                    )}
-                                    {expense.username && (
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-medium">
-                                            @{expense.username}
-                                        </span>
-                                    )}
+                                        <button
+                                            onClick={() => handleDeleteClick(expense)}
+                                            className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all text-xs flex items-center gap-1"
+                                            title={t('expenses.deleteExpense')}
+                                        >
+                                            <Trash2 size={14} />
+                                            <span className="sm:hidden">Hapus</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="text-right mr-4">
-                                <p className="font-bold text-main">-{formatCurrency(expense.amount)}</p>
-                                <p className="text-xs text-muted">{t(`categories.${expense.category}`) || expense.category}</p>
-                            </div>
-
-                            {/* Edit Button */}
-                            <button
-                                onClick={() => handleEditClick(expense)}
-                                className="p-2 text-slate-600 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100 mr-1"
-                                title={t('expenses.editExpense') || 'Edit'}
-                            >
-                                <Pencil size={16} />
-                            </button>
-
-                            {/* Delete Button */}
-                            <button
-                                onClick={() => handleDeleteClick(expense)}
-                                className="p-2 text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                title={t('expenses.deleteExpense')}
-                            >
-                                <Trash2 size={16} />
-                            </button>
                         </div>
                     ))}
                 </div>
+
+                {/* Edit Button */}
+                <button
+                    onClick={() => handleEditClick(expense)}
+                    className="p-2 text-slate-600 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100 mr-1"
+                    title={t('expenses.editExpense') || 'Edit'}
+                >
+                    <Pencil size={16} />
+                </button>
+
+                {/* Delete Button */}
+                <button
+                    onClick={() => handleDeleteClick(expense)}
+                    className="p-2 text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                    title={t('expenses.deleteExpense')}
+                >
+                    <Trash2 size={16} />
+                </button>
             </div>
+                    ))}
+        </div >
+            </div >
 
-            {/* Delete Confirmation Modal */}
-            <ConfirmModal
-                isOpen={deleteModal.isOpen}
-                onClose={() => setDeleteModal({ isOpen: false, expense: null })}
-                onConfirm={handleConfirmDelete}
-                title="Hapus Pengeluaran?"
-                message={`Yakin ingin menghapus "${deleteModal.expense?.title}"? Tindakan ini tidak dapat dibatalkan.`}
-                confirmText="Hapus"
-                cancelText="Batal"
-                type="danger"
+    {/* Delete Confirmation Modal */ }
+    < ConfirmModal
+isOpen = { deleteModal.isOpen }
+onClose = {() => setDeleteModal({ isOpen: false, expense: null })}
+onConfirm = { handleConfirmDelete }
+title = "Hapus Pengeluaran?"
+message = {`Yakin ingin menghapus "${deleteModal.expense?.title}"? Tindakan ini tidak dapat dibatalkan.`}
+confirmText = "Hapus"
+cancelText = "Batal"
+type = "danger"
+    />
+
+    {/* Edit Expense Modal */ }
+    < EditExpenseModal
+isOpen = { editModal.isOpen }
+onClose = {() => setEditModal({ isOpen: false, expense: null })}
+onSave = { handleSaveEdit }
+expense = { editModal.expense }
+    />
+
+    {/* Receipt Preview Modal */ }
+{
+    receiptModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+                className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-200"
+                onClick={() => setReceiptModal({ isOpen: false, url: null })}
             />
-
-            {/* Edit Expense Modal */}
-            <EditExpenseModal
-                isOpen={editModal.isOpen}
-                onClose={() => setEditModal({ isOpen: false, expense: null })}
-                onSave={handleSaveEdit}
-                expense={editModal.expense}
-            />
-
-            {/* Receipt Preview Modal */}
-            {receiptModal.isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-200"
+            <div className="relative w-full max-w-2xl bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 animate-in zoom-in-95 duration-200">
+                <div className="absolute top-4 right-4 z-10">
+                    <button
                         onClick={() => setReceiptModal({ isOpen: false, url: null })}
-                    />
-                    <div className="relative w-full max-w-2xl bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 animate-in zoom-in-95 duration-200">
-                        <div className="absolute top-4 right-4 z-10">
-                            <button
-                                onClick={() => setReceiptModal({ isOpen: false, url: null })}
-                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors backdrop-blur-md"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <img
-                            src={receiptModal.url}
-                            alt="Receipt"
-                            className="w-full h-auto max-h-[80vh] object-contain bg-black"
-                        />
-                    </div>
+                        className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors backdrop-blur-md"
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
-            )}
+                <img
+                    src={receiptModal.url}
+                    alt="Receipt"
+                    className="w-full h-auto max-h-[80vh] object-contain bg-black"
+                />
+            </div>
+        </div>
+    )
+}
         </>
     );
 };

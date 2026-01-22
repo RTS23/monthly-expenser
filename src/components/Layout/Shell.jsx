@@ -81,22 +81,22 @@ const Shell = ({ children, activeTab, onTabChange }) => {
                             {/* Profile Button */}
                             <button
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className="w-full flex items-center justify-center lg:justify-start gap-3 p-2 lg:p-3 rounded-xl hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-700/50 text-left"
+                                className="w-full flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1 lg:gap-3 p-2 lg:p-3 rounded-xl hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-700/50"
                             >
                                 {user.avatar ? (
                                     <img
                                         src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
                                         alt="User"
-                                        className="w-10 h-10 rounded-full ring-2 ring-slate-900 flex-shrink-0"
+                                        className="w-8 h-8 lg:w-10 lg:h-10 rounded-full ring-2 ring-slate-900 flex-shrink-0"
                                     />
                                 ) : (
-                                    <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center ring-2 ring-slate-900 flex-shrink-0">
-                                        <span className="text-sm font-bold text-indigo-400">
+                                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-indigo-500/20 flex items-center justify-center ring-2 ring-slate-900 flex-shrink-0">
+                                        <span className="text-xs lg:text-sm font-bold text-indigo-400">
                                             {user.username.charAt(0).toUpperCase()}
                                         </span>
                                     </div>
                                 )}
-                                <div className="hidden lg:block overflow-hidden flex-1">
+                                <div className="hidden lg:block overflow-hidden flex-1 text-left">
                                     <p className="text-sm font-semibold truncate text-main">{user.username}</p>
                                     <p className="text-xs text-muted truncate">Online</p>
                                 </div>
@@ -105,20 +105,20 @@ const Shell = ({ children, activeTab, onTabChange }) => {
                                 </div>
                             </button>
 
-                            {/* Dropdown Menu - Mobile Optimized */}
+                            {/* Dropdown Menu */}
                             {isProfileOpen && (
-                                <div className="absolute bottom-full left-0 w-full mb-2 px-2 lg:px-4 animate-in slide-in-from-bottom-2 fade-in duration-200 z-50">
+                                <div className="absolute bottom-full left-0 w-full mb-2 px-1 lg:px-4 animate-in slide-in-from-bottom-2 fade-in duration-200 z-50">
                                     <div className="bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-xl overflow-hidden p-1.5">
                                         {/* Mobile: Show username in dropdown */}
                                         <div className="lg:hidden px-3 py-2 border-b border-slate-700/50 mb-1">
-                                            <p className="text-xs text-slate-400">Signed in as</p>
-                                            <p className="text-sm font-semibold text-white truncate">{user.username}</p>
+                                            <p className="text-[10px] text-slate-400">Signed in as</p>
+                                            <p className="text-xs font-semibold text-white truncate">{user.username}</p>
                                         </div>
                                         <button
                                             onClick={logout}
-                                            className="w-full flex items-center justify-center lg:justify-start gap-2 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors text-sm font-medium"
+                                            className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors text-xs font-medium"
                                         >
-                                            <LogOut size={16} />
+                                            <LogOut size={14} />
                                             <span>Log Out</span>
                                         </button>
                                     </div>

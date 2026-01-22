@@ -33,45 +33,45 @@ const BudgetSettings = () => {
     const hasBudget = budget > 0;
 
     return (
-        <div className="glass-panel p-8 rounded-2xl max-w-xl mx-auto transition-all duration-300">
-            <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
-                    <Wallet size={24} />
+        <div className="glass-panel p-4 sm:p-8 rounded-2xl max-w-xl mx-auto transition-all duration-300">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <Wallet size={20} className="sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-semibold text-main">{t('budget.title')}</h2>
-                    <p className="text-muted text-sm">{t('budget.perMonth')}</p>
+                    <h2 className="text-lg sm:text-xl font-semibold text-main">{t('budget.title')}</h2>
+                    <p className="text-muted text-xs sm:text-sm">{t('budget.perMonth')}</p>
                 </div>
             </div>
 
             {/* View Mode */}
             {!isEditing && (
-                <div className="space-y-6 animate-in fade-in duration-300">
-                    <div className={`p-6 rounded-xl border ${hasBudget ? 'bg-indigo-500/10 border-indigo-500/20' : 'bg-slate-800/30 border-slate-700/30'}`}>
-                        <p className="text-sm text-muted mb-1">
+                <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-300">
+                    <div className={`p-4 sm:p-6 rounded-xl border ${hasBudget ? 'bg-indigo-500/10 border-indigo-500/20' : 'bg-slate-800/30 border-slate-700/30'}`}>
+                        <p className="text-xs sm:text-sm text-muted mb-1">
                             {hasBudget ? t('budget.currentBudget') : t('budget.noBudget')}
                         </p>
-                        <p className={`text-3xl font-bold ${hasBudget ? 'text-main' : 'text-slate-500'}`}>
+                        <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${hasBudget ? 'text-main' : 'text-slate-500'} break-all`}>
                             {hasBudget ? formatCurrency(budget) : formatCurrency(0)}
                         </p>
                     </div>
 
-                    <div className="mb-6 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                    <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                                 {rateLoading ? (
-                                    <Loader2 size={18} className="text-indigo-400 animate-spin" />
+                                    <Loader2 size={16} className="sm:w-[18px] sm:h-[18px] text-indigo-400 animate-spin flex-shrink-0" />
                                 ) : (
-                                    <RefreshCw size={18} className="text-indigo-400" />
+                                    <RefreshCw size={16} className="sm:w-[18px] sm:h-[18px] text-indigo-400 flex-shrink-0" />
                                 )}
-                                <div className="text-sm">
+                                <div className="text-xs sm:text-sm min-w-0">
                                     <span className="text-muted">Kurs Live: </span>
                                     <span className="text-indigo-400 font-medium">
                                         $1 = Rp {exchangeRate.toLocaleString('id-ID', { maximumFractionDigits: 0 })}
                                     </span>
                                 </div>
                             </div>
-                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-medium rounded-full">
+                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-medium rounded-full flex-shrink-0">
                                 LIVE
                             </span>
                         </div>
