@@ -41,7 +41,12 @@ export function AuthProvider({ children }) {
     };
 
     const login = () => {
-        window.location.href = `${API_BASE}/auth/discord`;
+        // Use relative path so Vercel proxies it (Same-Origin)
+        if (API_BASE === '') {
+            window.location.href = '/auth/discord';
+        } else {
+            window.location.href = `${API_BASE}/auth/discord`;
+        }
     };
 
     const logout = () => {
