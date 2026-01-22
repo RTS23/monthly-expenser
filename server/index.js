@@ -20,18 +20,14 @@ const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const isProduction = process.env.NODE_ENV === 'production';
 
-// CHECKPOINT: Debugging OAuth Variables
-console.log('--- STARTUP DEBUG ---');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('CALLBACK_URL (env):', process.env.CALLBACK_URL);
-console.log('FRONTEND_URL (env):', process.env.FRONTEND_URL);
-console.log('--- END DEBUG ---');
-
 // 1. Secure Headers (Helmet)
 app.use(helmet({
     contentSecurityPolicy: isProduction, // Enable in production
     crossOriginEmbedderPolicy: false
 }));
+
+// Trust Proxy (Required for Render/Heroku to detect HTTPS)
+app.set('trust proxy', 1);
 
 // 2. Rate Limiting
 const globalLimiter = rateLimit({
@@ -60,10 +56,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: isProduction, // Auto-enable for production
+        secure: isProduction, // Must be true for SameSite=None
         httpOnly: true, // Prevents XSS theft
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
-        sameSite: isProduction ? 'strict' : 'lax' // Stricter in production
+        sameSite: isProduction ? 'none' : 'lax' // Allow cross-site usage in production
     }
 }));
 app.use(passport.initialize());
