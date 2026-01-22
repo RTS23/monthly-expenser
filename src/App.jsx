@@ -73,20 +73,22 @@ const MainContent = () => {
             {/* Floating Add Expense Button - Only on dashboard/expenses */}
             {(activeTab === 'dashboard' || activeTab === 'expenses') && <AddExpenseForm />}
 
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="max-w-4xl mx-auto space-y-4 md:space-y-6">
                 {/* Header with Quick Settings */}
-                <header className="mb-8 animate-in slide-in-from-top-4 duration-500">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h1 className="text-3xl font-bold text-main">
+                <header className="mb-4 md:mb-8 animate-in slide-in-from-top-4 duration-500">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-main truncate">
                                 {activeTab === 'dashboard' ? t('nav.dashboard') :
                                     activeTab === 'expenses' ? t('nav.expenses') :
                                         activeTab === 'budget' ? t('nav.budget') :
                                             language === 'id' ? 'Pengeluaran Rutin' : 'Recurring Expenses'}
                             </h1>
-                            <p className="text-muted">{t('dashboard.subtitle')}</p>
+                            <p className="text-muted text-sm">{t('dashboard.subtitle')}</p>
                         </div>
-                        <QuickSettings />
+                        <div className="flex-shrink-0">
+                            <QuickSettings />
+                        </div>
                     </div>
                 </header>
 

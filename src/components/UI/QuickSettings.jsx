@@ -127,7 +127,7 @@ export const ThemeSwitcher = () => {
     return (
         <button
             onClick={toggleTheme}
-            className={`flex items-center justify-center p-2 rounded-xl border transition-all duration-300
+            className={`flex items-center justify-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border transition-all duration-300
                 ${theme === 'dark'
                     ? 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800 text-yellow-400'
                     : 'bg-white/50 border-slate-200/50 hover:bg-white text-indigo-600 shadow-sm'
@@ -135,7 +135,7 @@ export const ThemeSwitcher = () => {
             `}
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === 'dark' ? <Sun size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Moon size={16} className="sm:w-[18px] sm:h-[18px]" />}
         </button>
     );
 };
@@ -148,17 +148,17 @@ const QuickSettings = () => {
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
             <button
                 onClick={restartTour}
-                className="flex items-center justify-center p-2 rounded-xl border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors duration-300"
+                className="flex items-center justify-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors duration-300"
                 title="Restart Tour"
             >
-                <HelpCircle size={18} />
+                <HelpCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700/50 mx-1" />
+            <div className="w-px h-5 sm:h-6 bg-slate-200 dark:bg-slate-700/50" />
             <ThemeSwitcher />
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700/50 mx-1" />
+            <div className="w-px h-5 sm:h-6 bg-slate-200 dark:bg-slate-700/50" />
             <LanguageSwitcher />
             <CurrencySwitcher />
         </div>

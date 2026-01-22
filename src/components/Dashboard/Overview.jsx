@@ -24,32 +24,32 @@ const Overview = () => {
     };
 
     return (
-        <div data-tour="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 perspective-1000">
+        <div data-tour="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8 perspective-1000">
             {/* Total Budget Card */}
-            <div className="glass-panel tilt-3d p-6 rounded-2xl relative overflow-hidden group stagger-1">
+            <div className="glass-panel tilt-3d p-4 sm:p-6 rounded-2xl relative overflow-hidden group stagger-1">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-all duration-500 group-hover:scale-110">
-                    <Wallet size={80} className="text-indigo-400" />
+                    <Wallet size={60} className="sm:w-20 sm:h-20 text-indigo-400" />
                 </div>
                 <div className="relative z-10">
-                    <h3 className="text-muted text-sm font-medium mb-1">{t('dashboard.monthlyBudget')}</h3>
-                    <p className="text-3xl font-bold text-main count-up">{formatCurrency(budget)}</p>
-                    <div className="mt-4 text-xs text-muted">
+                    <h3 className="text-muted text-xs sm:text-sm font-medium mb-1">{t('dashboard.monthlyBudget')}</h3>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-main count-up">{formatCurrency(budget)}</p>
+                    <div className="mt-2 sm:mt-4 text-xs text-muted">
                         {t('dashboard.definedLimit')}
                     </div>
                 </div>
             </div>
 
             {/* Spent Card */}
-            <div className="glass-panel tilt-3d p-6 rounded-2xl relative overflow-hidden group stagger-2">
+            <div className="glass-panel tilt-3d p-4 sm:p-6 rounded-2xl relative overflow-hidden group stagger-2">
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-all duration-500 group-hover:scale-110 text-rose-500">
-                    <TrendingDown size={80} />
+                    <TrendingDown size={60} className="sm:w-20 sm:h-20" />
                 </div>
                 <div className="relative z-10">
-                    <h3 className="text-muted text-sm font-medium mb-1">{t('dashboard.totalSpent')}</h3>
-                    <p className="text-3xl font-bold text-main count-up">{formatCurrency(totalSpent)}</p>
-                    <div className="mt-4 text-xs text-rose-300 flex items-center">
+                    <h3 className="text-muted text-xs sm:text-sm font-medium mb-1">{t('dashboard.totalSpent')}</h3>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-main count-up">{formatCurrency(totalSpent)}</p>
+                    <div className="mt-2 sm:mt-4 text-xs text-rose-300 flex items-center">
                         <TrendingDown size={14} className="mr-1" />
                         <span className={percentage >= 80 ? 'animate-pulse' : ''}>{percentage.toFixed(1)}% {t('dashboard.budgetUsed')}</span>
                     </div>
@@ -57,19 +57,19 @@ const Overview = () => {
             </div>
 
             {/* Remaining Card */}
-            <div className="glass-panel tilt-3d p-6 rounded-2xl relative overflow-hidden group stagger-3">
+            <div className="glass-panel tilt-3d p-4 sm:p-6 rounded-2xl relative overflow-hidden group stagger-3">
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-all duration-500 group-hover:scale-110 text-emerald-500">
-                    <TrendingUp size={80} />
+                    <TrendingUp size={60} className="sm:w-20 sm:h-20" />
                 </div>
                 <div className="relative z-10">
-                    <h3 className="text-muted text-sm font-medium mb-1">{t('dashboard.remaining')}</h3>
-                    <p className={`text-3xl font-bold count-up ${remaining < 0 ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`}>
+                    <h3 className="text-muted text-xs sm:text-sm font-medium mb-1">{t('dashboard.remaining')}</h3>
+                    <p className={`text-xl sm:text-2xl md:text-3xl font-bold count-up ${remaining < 0 ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`}>
                         {formatCurrency(remaining)}
                     </p>
 
                     {/* Animated Progress Bar */}
-                    <div className="mt-4 w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                    <div className="mt-2 sm:mt-4 w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
                         <div
                             className={`h-full rounded-full transition-all duration-1000 ease-out ${getProgressColor()} shadow-lg ${getProgressGlow()}`}
                             style={{ width: `${percentage}%` }}
