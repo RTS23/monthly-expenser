@@ -5,6 +5,8 @@ dotenv.config();
 
 const admins = (process.env.ADMIN_USER_IDS || '').split(',').map(id => id.trim());
 const CALLBACK_URL = process.env.CALLBACK_URL || 'http://localhost:3001/auth/discord/callback';
+console.log('DEBUG: Raw process.env.CALLBACK_URL:', process.env.CALLBACK_URL);
+console.log('DEBUG: Final CALLBACK_URL used:', CALLBACK_URL);
 
 passport.serializeUser((user, done) => {
     done(null, user);
