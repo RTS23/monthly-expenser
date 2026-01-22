@@ -15,6 +15,7 @@ import PersonalAnalytics from './components/Dashboard/PersonalAnalytics';
 import DateRangeFilter from './components/Dashboard/DateRangeFilter';
 import SearchBar from './components/Dashboard/SearchBar';
 import QuickSettings from './components/UI/QuickSettings';
+import Login from './components/Auth/Login';
 import AppTour from './components/Common/AppTour';
 
 const AuthGuard = ({ children }) => {
