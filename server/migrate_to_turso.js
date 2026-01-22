@@ -25,6 +25,51 @@ const turso = createClient({
 const migrate = async () => {
     console.log("🚀 Starting migration to Turso...");
 
+    // 0. Ensure Tables Exist
+    try {
+        console.log("📦 Creating tables if they don't exist...");
+        await turso.execute(`
+            CREATE TABLE IF NOT EXISTS expenses (
+                id TEXT PRIMARY KEY,
+                amount REAL NOT NULL,
+                category TEXT NOT NULL,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL,
+                userId TEXT DEFAULT NULL,
+                username TEXT DEFAULT NULL,
+                receiptUrl TEXT DEFAULT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await turso.execute(`
+            CREATE TABLE IF NOT EXISTS budgets (
+                userId TEXT PRIMARY KEY,
+                username TEXT,
+                amount REAL NOT NULL,
+                lastAlertLevel TEXT DEFAULT 'NONE', 
+                lastAlertMonth TEXT DEFAULT NULL
+            )
+        `);
+
+        await turso.execute(`
+            CREATE TABLE IF NOT EXISTS recurring_expenses (
+                id TEXT PRIMARY KEY,
+                amount REAL NOT NULL,
+                category TEXT NOT NULL,
+                title TEXT NOT NULL,
+                dayOfMonth INTEGER NOT NULL,
+                userId TEXT DEFAULT NULL,
+                username TEXT DEFAULT NULL,
+                lastGeneratedDate TEXT DEFAULT NULL
+            )
+        `);
+        console.log("✅ Tables verified.");
+    } catch (e) {
+        console.error("Error creating tables:", e);
+        // Continue anyway, maybe they exist
+    }
+
     // A. Migrate Expenses
     try {
         const expenses = localDb.prepare('SELECT * FROM expenses').all();
