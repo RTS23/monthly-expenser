@@ -54,6 +54,7 @@ const AddExpenseForm = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
+                data-tour="add-expense-btn"
                 className="fixed bottom-6 right-6 group z-40"
             >
                 {/* Glow ring */}

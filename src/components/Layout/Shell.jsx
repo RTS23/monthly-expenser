@@ -56,6 +56,7 @@ const Shell = ({ children, activeTab, onTabChange }) => {
                             <button
                                 key={item.id}
                                 onClick={() => onTabChange(item.id)}
+                                data-tour={item.id === 'budget' ? 'manage-budget-link' : item.id === 'recurring' ? 'recurring-link' : undefined}
                                 className={`
                   relative flex items-center justify-center lg:justify-start w-full p-3 rounded-xl transition-all duration-200 group
                   ${isActive

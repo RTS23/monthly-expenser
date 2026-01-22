@@ -24,7 +24,7 @@ const Overview = () => {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 perspective-1000">
+        <div data-tour="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 perspective-1000">
             {/* Total Budget Card */}
             <div className="glass-panel tilt-3d p-6 rounded-2xl relative overflow-hidden group stagger-1">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

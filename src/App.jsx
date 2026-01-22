@@ -15,7 +15,7 @@ import PersonalAnalytics from './components/Dashboard/PersonalAnalytics';
 import DateRangeFilter from './components/Dashboard/DateRangeFilter';
 import SearchBar from './components/Dashboard/SearchBar';
 import QuickSettings from './components/UI/QuickSettings';
-import Login from './components/Auth/Login';
+import AppTour from './components/Common/AppTour';
 
 const AuthGuard = ({ children }) => {
     const { user, loading, login } = useAuth();
@@ -91,7 +91,7 @@ const MainContent = () => {
 
                 {/* Filters Row */}
                 {(activeTab === 'dashboard' || activeTab === 'expenses') && (
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div data-tour="filters" className="flex flex-wrap items-center gap-3">
                         <SearchBar
                             searchQuery={searchQuery}
                             onSearchChange={setSearchQuery}
@@ -158,6 +158,7 @@ const MainContent = () => {
                     </div>
                 )}
             </div>
+            <AppTour />
         </Shell>
     );
 };
