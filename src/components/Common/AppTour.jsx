@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 import { useSettings } from '../../contexts/SettingsContext';
 
+// Fix: Use SettingsContext instead of non-existent ThemeContext
 const AppTour = () => {
     const { theme } = useSettings();
     const isDarkMode = theme === 'dark';
