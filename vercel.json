@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://spendsync-api.onrender.com/api/:path*"
+        },
+        {
+            "source": "/auth/:path*",
+            "destination": "https://spendsync-api.onrender.com/auth/:path*"
+        },
+        {
+            "source": "/uploads/:path*",
+            "destination": "https://spendsync-api.onrender.com/uploads/:path*"
+        }
+    ]
+}
