@@ -20,6 +20,13 @@ const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const isProduction = process.env.NODE_ENV === 'production';
 
+// CHECKPOINT: Debugging OAuth Variables
+console.log('--- STARTUP DEBUG ---');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('CALLBACK_URL (env):', process.env.CALLBACK_URL);
+console.log('FRONTEND_URL (env):', process.env.FRONTEND_URL);
+console.log('--- END DEBUG ---');
+
 // 1. Secure Headers (Helmet)
 app.use(helmet({
     contentSecurityPolicy: isProduction, // Enable in production
