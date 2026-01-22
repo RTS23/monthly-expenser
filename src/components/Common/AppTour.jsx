@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useSettings } from '../../contexts/SettingsContext';
 
 const AppTour = () => {
-    const { isDarkMode } = useTheme();
+    const { theme } = useSettings();
+    const isDarkMode = theme === 'dark';
     const [run, setRun] = useState(false);
 
     useEffect(() => {
