@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
+import Joyride, { STATUS } from 'react-joyride';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const AppTour = () => {
-    const { theme, t } = useSettings();
+    const { theme } = useSettings();
     const isDarkMode = theme === 'dark';
     const [run, setRun] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        // Check screen size
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
         checkMobile();
         window.addEventListener('resize', checkMobile);
@@ -17,32 +16,50 @@ const AppTour = () => {
     }, []);
 
     useEffect(() => {
-        // Check if user has seen the tour
         const hasSeenTour = localStorage.getItem('hasSeenTour_v1');
         if (!hasSeenTour) {
-            // Small delay to let the page render first
-            setTimeout(() => setRun(true), 500);
+            setTimeout(() => setRun(true), 800);
         }
     }, []);
 
     const handleJoyrideCallback = (data) => {
-        const { status, type } = data;
-        const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-
-        if (finishedStatuses.includes(status)) {
+        const { status } = data;
+        if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
             setRun(false);
             localStorage.setItem('hasSeenTour_v1', 'true');
         }
     };
 
-    // Mobile-optimized steps (skip sidebar items on mobile since they're hidden)
-    const steps = [
+    // Mobile: Only 3 simple steps, all centered
+    const mobileSteps = [
+        {
+            target: 'body',
+            content: '👋 Welcome! Tap the + button to add expenses.',
+            placement: 'center',
+            disableBeacon: true,
+        },
+        {
+            target: 'body',
+            content: '📊 Your budget stats are at the top.',
+            placement: 'center',
+            disableBeacon: true,
+        },
+        {
+            target: 'body',
+            content: '🔍 Use the search bar to filter. All done!',
+            placement: 'center',
+            disableBeacon: true,
+        }
+    ];
+
+    // Desktop: Full tour with targeted elements
+    const desktopSteps = [
         {
             target: 'body',
             content: (
-                <div className="text-sm">
-                    <h3 className="font-bold text-base mb-2">Welcome to SpendSync! 👋</h3>
-                    <p>Let's take a quick tour to help you get started.</p>
+                <div>
+                    <strong>Welcome to SpendSync! 👋</strong>
+                    <p style={{ marginTop: 8 }}>Let's take a quick tour.</p>
                 </div>
             ),
             placement: 'center',
@@ -50,55 +67,27 @@ const AppTour = () => {
         },
         {
             target: '[data-tour="add-expense-btn"]',
-            content: (
-                <div className="text-sm">
-                    <p>➕ Tap here to add a new expense!</p>
-                </div>
-            ),
-            placement: isMobile ? 'top' : 'left',
-            disableScrolling: isMobile,
+            content: '➕ Click here to add a new expense.',
+            placement: 'left',
         },
         {
             target: '[data-tour="dashboard-stats"]',
-            content: (
-                <div className="text-sm">
-                    <p>📊 Your spending summary at a glance.</p>
-                </div>
-            ),
+            content: '📊 Your spending summary at a glance.',
             placement: 'bottom',
         },
-        // Only show sidebar items on desktop
-        ...(!isMobile ? [
-            {
-                target: '[data-tour="manage-budget-link"]',
-                content: (
-                    <div className="text-sm">
-                        <p>💰 Set your monthly budget limits here.</p>
-                    </div>
-                ),
-                placement: 'right',
-            },
-            {
-                target: '[data-tour="recurring-link"]',
-                content: (
-                    <div className="text-sm">
-                        <p>🔄 Manage recurring bills like rent or subscriptions.</p>
-                    </div>
-                ),
-                placement: 'right',
-            },
-        ] : []),
+        {
+            target: '[data-tour="manage-budget-link"]',
+            content: '💰 Set your budget limits here.',
+            placement: 'right',
+        },
         {
             target: '[data-tour="filters"]',
-            content: (
-                <div className="text-sm">
-                    <p>🔍 Search and filter your expenses.</p>
-                    <p className="text-xs opacity-70 mt-1">That's it! You're ready to go.</p>
-                </div>
-            ),
-            placement: isMobile ? 'bottom' : 'bottom',
+            content: '🔍 Search and filter expenses. All done!',
+            placement: 'bottom',
         }
     ];
+
+    const steps = isMobile ? mobileSteps : desktopSteps;
 
     return (
         <Joyride
@@ -107,52 +96,50 @@ const AppTour = () => {
             continuous
             showSkipButton
             showProgress
-            scrollToFirstStep
-            disableScrollParentFix={isMobile}
+            disableScrolling={isMobile}
+            disableOverlayClose={false}
             callback={handleJoyrideCallback}
-            floaterProps={{
-                disableAnimation: isMobile,
-            }}
             styles={{
                 options: {
-                    arrowColor: isDarkMode ? '#1f2937' : '#fff',
-                    backgroundColor: isDarkMode ? '#1f2937' : '#fff',
-                    overlayColor: 'rgba(0, 0, 0, 0.6)',
+                    arrowColor: isDarkMode ? '#1e293b' : '#fff',
+                    backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+                    overlayColor: 'rgba(0, 0, 0, 0.7)',
                     primaryColor: '#8b5cf6',
-                    textColor: isDarkMode ? '#fff' : '#333',
+                    textColor: isDarkMode ? '#e2e8f0' : '#334155',
                     zIndex: 10000,
-                    width: isMobile ? 280 : 340,
+                    width: isMobile ? 260 : 320,
                 },
                 tooltip: {
-                    padding: isMobile ? '12px 16px' : '16px 20px',
-                    borderRadius: '16px',
+                    padding: isMobile ? 12 : 16,
+                    borderRadius: 12,
+                    fontSize: isMobile ? 13 : 14,
                 },
-                tooltipContainer: {
-                    textAlign: 'left',
+                tooltipContent: {
+                    padding: isMobile ? '4px 0' : '8px 0',
                 },
                 buttonNext: {
                     backgroundColor: '#8b5cf6',
-                    borderRadius: '10px',
-                    padding: isMobile ? '8px 16px' : '10px 20px',
-                    fontSize: isMobile ? '13px' : '14px',
+                    borderRadius: 8,
+                    padding: isMobile ? '6px 12px' : '8px 16px',
+                    fontSize: isMobile ? 12 : 13,
                 },
                 buttonBack: {
-                    color: isDarkMode ? '#fff' : '#333',
-                    marginRight: '8px',
-                    fontSize: isMobile ? '13px' : '14px',
+                    color: isDarkMode ? '#94a3b8' : '#64748b',
+                    fontSize: isMobile ? 12 : 13,
+                    marginRight: 8,
                 },
                 buttonSkip: {
-                    color: isDarkMode ? '#94a3b8' : '#64748b',
-                    fontSize: isMobile ? '12px' : '13px',
+                    color: isDarkMode ? '#64748b' : '#94a3b8',
+                    fontSize: isMobile ? 11 : 12,
                 },
                 spotlight: {
-                    borderRadius: '12px',
+                    borderRadius: 8,
                 },
             }}
             locale={{
                 back: 'Back',
-                close: 'Close',
-                last: 'Done!',
+                close: 'X',
+                last: 'Done',
                 next: 'Next',
                 skip: 'Skip',
             }}
