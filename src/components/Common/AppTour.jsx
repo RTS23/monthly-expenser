@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Joyride, { STATUS } from 'react-joyride';
 import { useSettings } from '../../contexts/SettingsContext';
+// Onboarding tour component - mobile optimized
 
 const AppTour = () => {
     const { theme } = useSettings();
