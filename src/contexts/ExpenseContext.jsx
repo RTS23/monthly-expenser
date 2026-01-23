@@ -125,9 +125,8 @@ export function ExpenseProvider({ children }) {
                 body: JSON.stringify(expenseData),
             });
             if (res.ok) {
-                setExpenses(prev => prev.map(exp =>
-                    exp.id === id ? { ...exp, ...expenseData } : exp
-                ));
+                // Refetch all data to ensure UI is in sync with database
+                fetchData();
             }
         } catch (e) {
             console.error("Failed to update expense", e);

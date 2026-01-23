@@ -13,7 +13,7 @@ const categories = [
 ];
 
 const EditExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
-    const { t, theme, language } = useSettings();
+    const { t, theme, language, fromBaseCurrency, toBaseCurrency, currency } = useSettings();
     const [formData, setFormData] = useState({
         title: '',
         amount: '',
@@ -23,23 +23,28 @@ const EditExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
 
     useEffect(() => {
         if (expense) {
+            // Convert from base currency (USD in DB) to display currency
+            const displayAmount = fromBaseCurrency(expense.amount || 0);
             setFormData({
                 title: expense.title || '',
-                amount: expense.amount || '',
+                amount: currency === 'IDR' ? Math.round(displayAmount) : displayAmount,
                 category: expense.category || 'Food',
                 date: expense.date ? expense.date.split('T')[0] : ''
             });
         }
-    }, [expense]);
+    }, [expense, currency, fromBaseCurrency]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!formData.title || !formData.amount) return;
 
+        // Convert back to base currency (USD) for storage
+        const baseAmount = toBaseCurrency(Number(formData.amount));
+
         onSave({
             ...expense,
             title: formData.title,
-            amount: Number(formData.amount),
+            amount: baseAmount,
             category: formData.category,
             date: formData.date ? new Date(formData.date).toISOString() : expense.date
         });
