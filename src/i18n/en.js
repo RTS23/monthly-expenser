@@ -101,7 +101,18 @@ export const en = {
     // Filters
     filters: {
         allTime: 'All Time',
-        allUsers: 'All Users'
+        allUsers: 'All Users',
+        today: 'Today',
+        thisWeek: 'This Week',
+        thisMonth: 'This Month',
+        last30Days: 'Last 30 Days',
+        allCategories: 'All Categories',
+        category: 'Category',
+        dateRange: 'Date Range',
+        amountRange: 'Amount Range',
+        clearAll: 'Clear All',
+        filters: 'Filters',
+        search: 'Search expenses...'
     },
 
     // Toasts

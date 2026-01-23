@@ -101,7 +101,18 @@ export const id = {
     // Filter
     filters: {
         allTime: 'Semua Waktu',
-        allUsers: 'Semua Pengguna'
+        allUsers: 'Semua Pengguna',
+        today: 'Hari Ini',
+        thisWeek: 'Minggu Ini',
+        thisMonth: 'Bulan Ini',
+        last30Days: '30 Hari Terakhir',
+        allCategories: 'Semua Kategori',
+        category: 'Kategori',
+        dateRange: 'Rentang Tanggal',
+        amountRange: 'Rentang Jumlah',
+        clearAll: 'Hapus Semua',
+        filters: 'Filter',
+        search: 'Cari pengeluaran...'
     },
 
     // Notifikasi

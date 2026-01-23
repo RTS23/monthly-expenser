@@ -19,6 +19,8 @@ export function ExpenseProvider({ children }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [dateRange, setDateRange] = useState(null); // Date range filter { start, end }
     const [searchQuery, setSearchQuery] = useState(''); // Search filter
+    const [categoryFilter, setCategoryFilter] = useState(null); // Category filter
+    const [amountRange, setAmountRange] = useState({ min: null, max: null }); // Amount range filter
 
     const [recurringExpenses, setRecurringExpenses] = useState([]);
 
@@ -201,6 +203,21 @@ export function ExpenseProvider({ children }) {
         );
     }
 
+    // Filter by Category
+    if (categoryFilter) {
+        filteredExpenses = filteredExpenses.filter(e => e.category === categoryFilter);
+    }
+
+    // Filter by Amount Range
+    if (amountRange.min !== null || amountRange.max !== null) {
+        filteredExpenses = filteredExpenses.filter(e => {
+            const amount = Number(e.amount);
+            if (amountRange.min !== null && amount < amountRange.min) return false;
+            if (amountRange.max !== null && amount > amountRange.max) return false;
+            return true;
+        });
+    }
+
     // Export to CSV function
     const exportToCSV = () => {
         const headers = ['Date', 'Title', 'Category', 'Amount', 'User'];
@@ -241,6 +258,10 @@ export function ExpenseProvider({ children }) {
         setDateRange,
         searchQuery,
         setSearchQuery,
+        categoryFilter,
+        setCategoryFilter,
+        amountRange,
+        setAmountRange,
         recurringExpenses,
         addRecurringExpense,
         deleteRecurringExpense,

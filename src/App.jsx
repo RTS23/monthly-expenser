@@ -13,7 +13,7 @@ import RecurringExpenses from './components/Budget/RecurringExpenses';
 import GroupAnalytics from './components/Dashboard/GroupAnalytics';
 import PersonalAnalytics from './components/Dashboard/PersonalAnalytics';
 import DateRangeFilter from './components/Dashboard/DateRangeFilter';
-import SearchBar from './components/Dashboard/SearchBar';
+import UnifiedFilterBar from './components/Dashboard/UnifiedFilterBar';
 import QuickSettings from './components/UI/QuickSettings';
 import Login from './components/Auth/Login';
 import AppTour from './components/Common/AppTour';
@@ -62,7 +62,7 @@ const BudgetWarningEffect = () => {
 
 const MainContent = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const { users, selectedUser, setSelectedUser, dateRange, setDateRange, searchQuery, setSearchQuery } = useExpenses();
+    const { users, selectedUser, setSelectedUser } = useExpenses();
     const { isAdmin } = useAuth();
     const { t, language } = useSettings();
 
@@ -92,13 +92,10 @@ const MainContent = () => {
                     </div>
                 </header>
 
-                {/* Filters Row */}
+                {/* Unified Filters */}
                 {(activeTab === 'dashboard' || activeTab === 'expenses') && (
-                    <div data-tour="filters" className="flex flex-wrap items-center gap-3">
-                        <SearchBar
-                            searchQuery={searchQuery}
-                            onSearchChange={setSearchQuery}
-                        />
+                    <div data-tour="filters" className="space-y-3">
+                        <UnifiedFilterBar />
                         {isAdmin && (
                             <UserFilter
                                 users={users}
@@ -106,10 +103,6 @@ const MainContent = () => {
                                 onSelectUser={setSelectedUser}
                             />
                         )}
-                        <DateRangeFilter
-                            dateRange={dateRange}
-                            onDateRangeChange={setDateRange}
-                        />
                     </div>
                 )}
 
