@@ -127,11 +127,19 @@ app.get('/api/expenses', isAuthenticated, async (req, res) => {
             console.log(`[GET /api/expenses] Admin access. Returning all ${expenses.length} expenses.`);
             res.json({ expenses, budgets });
         } else {
-            const userExpenses = expenses.filter(e => e.userId === req.user.id);
-            const userBudget = budgets.filter(b => b.userId === req.user.id);
-            const monthlyBudgets = await getUserMonthlyBudgets(req.user.id);
+            // Fix: Use String conversion for robust ID comparison (handles DB Number vs Session String)
+            const userIdStr = String(req.user.id);
+            const userExpenses = expenses.filter(e => String(e.userId) === userIdStr);
+            const userBudget = budgets.filter(b => String(b.userId) === userIdStr);
+            const monthlyBudgets = await getUserMonthlyBudgets(req.user.id); // SQL handles types, hopefully
 
-            console.log(`[GET /api/expenses] User access. Found ${userExpenses.length} expenses matching ID ${req.user.id}. Total DB rows: ${expenses.length}`);
+            console.log(`[GET /api/expenses] User access.`);
+            console.log(`- Request User ID: "${req.user.id}" (Type: ${typeof req.user.id})`);
+            if (expenses.length > 0) {
+                console.log(`- Sample DB User ID: "${expenses[0].userId}" (Type: ${typeof expenses[0].userId})`);
+            }
+            console.log(`- Match Count: ${userExpenses.length} / ${expenses.length}`);
+
             res.json({ expenses: userExpenses, budgets: userBudget, monthlyBudgets });
         }
     } catch (error) {
