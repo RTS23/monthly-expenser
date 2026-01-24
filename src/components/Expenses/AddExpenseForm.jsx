@@ -16,8 +16,8 @@ const CATEGORIES = [
 ];
 
 const AddExpenseForm = () => {
-    const { addExpense, isAddExpenseOpen, setIsAddExpenseOpen, expenses } = useExpenses();
-    const { t, currency, toBaseCurrency, getCurrencySymbol, exchangeRate } = useSettings();
+    const { addExpense, isAddExpenseOpen, setIsAddExpenseOpen, expenses, savings, budget, updateBudget } = useExpenses();
+    const { t, currency, toBaseCurrency, getCurrencySymbol, exchangeRate, formatCurrency } = useSettings();
     const { showToast } = useToast();
     // const [isOpen, setIsOpen] = useState(false); // Removed local state
     const [formData, setFormData] = useState({
@@ -27,6 +27,7 @@ const AddExpenseForm = () => {
         date: new Date().toISOString().split('T')[0],
         receiptUrl: null
     });
+    const [newBudget, setNewBudget] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -35,6 +36,12 @@ const AddExpenseForm = () => {
 
         setIsSubmitting(true);
         const baseAmount = toBaseCurrency(Number(formData.amount));
+
+        // If new user (0 budget) sets a budget
+        if (budget === 0 && newBudget) {
+            const baseBudget = toBaseCurrency(Number(newBudget));
+            await updateBudget(baseBudget);
+        }
 
         const success = await addExpense({
             ...formData,
@@ -50,6 +57,7 @@ const AddExpenseForm = () => {
                 date: new Date().toISOString().split('T')[0],
                 receiptUrl: null
             });
+            setNewBudget('');
             setIsAddExpenseOpen(false);
         } else {
             showToast('Failed to add expense. Please try again.', 'error');
@@ -98,7 +106,7 @@ const AddExpenseForm = () => {
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="font-bold text-xl text-main flex items-center gap-2">
                             <Sparkles size={20} className="text-yellow-400" />
-                            {t('addExpenseForm.title')}
+                            {budget === 0 ? (currency === 'IDR' ? 'Mulai Berhemat' : 'Get Started') : t('addExpenseForm.title')}
                         </h3>
                         <button
                             onClick={() => !isSubmitting && setIsAddExpenseOpen(false)}
@@ -110,6 +118,40 @@ const AddExpenseForm = () => {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
+
+                        {/* FIRST TIME USER: Set Budget Input */}
+                        {budget === 0 && (
+                            <div className="animate-in slide-in-from-top-2 duration-500">
+                                <label className="block text-sm font-medium text-indigo-400 mb-2 flex items-center gap-2">
+                                    <Sparkles size={14} />
+                                    {currency === 'IDR' ? 'Set Anggaran Bulanan' : 'Set Monthly Budget'}
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-medium">{currencySymbol}</span>
+                                    <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder={currency === 'IDR' ? '5.000.000' : '2000'}
+                                        className="w-full bg-indigo-500/10 border border-indigo-500/50 rounded-xl pl-12 pr-4 py-3 text-white placeholder-indigo-300/30 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono"
+                                        value={newBudget ? (currency === 'IDR' ? Number(newBudget).toLocaleString('id-ID') : newBudget) : ''}
+                                        onChange={(e) => {
+                                            let val = e.target.value;
+                                            if (currency === 'IDR') {
+                                                val = val.replace(/\./g, '');
+                                                if (!/^\d*$/.test(val)) return;
+                                            }
+                                            setNewBudget(val);
+                                        }}
+                                        required
+                                        autoFocus
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                                <p className="text-xs text-slate-400 mt-2 ml-1">
+                                    {currency === 'IDR' ? 'Tentukan batas pengeluaran bulananmu.' : 'Set your spending limit for the month.'}
+                                </p>
+                            </div>
+                        )}
                         {/* Description */}
                         <div>
                             <label className="block text-sm font-medium text-main mb-2">
@@ -218,6 +260,36 @@ const AddExpenseForm = () => {
                             </div>
                         </div>
 
+                        {/* Budget Preview Calculation */}
+                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-slate-400">{currency === 'IDR' ? 'Sisa Anggaran' : 'Remaining Budget'}</span>
+                                <span className="font-medium text-white">
+                                    {budget === 0 && newBudget
+                                        ? formatCurrency(toBaseCurrency(Number(newBudget)))
+                                        : formatCurrency(savings)
+                                    }
+                                </span>
+                            </div>
+
+                            {formData.amount && (
+                                <>
+                                    <div className="h-px bg-slate-700/50 w-full" />
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-slate-400">{currency === 'IDR' ? 'Setelah Pengeluaran' : 'After Expense'}</span>
+                                        <span className={`font-bold transition-all duration-300 ${((budget === 0 && newBudget ? toBaseCurrency(Number(newBudget)) : savings) - toBaseCurrency(Number(formData.amount))) < 0
+                                                ? 'text-red-400 scale-105'
+                                                : 'text-emerald-400'
+                                            }`}>
+                                            {formatCurrency(
+                                                (budget === 0 && newBudget ? toBaseCurrency(Number(newBudget)) : savings) - toBaseCurrency(Number(formData.amount))
+                                            )}
+                                        </span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                         {/* Receipt Upload */}
                         <FileUpload
                             onUpload={(url) => setFormData({ ...formData, receiptUrl: url })}
@@ -236,7 +308,7 @@ const AddExpenseForm = () => {
                             ) : (
                                 <Plus size={20} />
                             )}
-                            {isSubmitting ? 'Saving...' : t('addExpenseForm.addButton')}
+                            {isSubmitting ? 'Saving...' : (budget === 0 ? (currency === 'IDR' ? 'Mulai & Simpan' : 'Start Journey') : t('addExpenseForm.addButton'))}
                         </button>
                     </form>
                 </div>
