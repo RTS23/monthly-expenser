@@ -53,11 +53,13 @@ const initDb = async () => {
                 lastGeneratedDate TEXT DEFAULT NULL
             )
         `);
-    console.log("Database initialized (LibSQL)");
+    console.log(`Database initialized using: ${url.startsWith("libsql") ? "Turso (Remote)" : "Local File (Ephemeral)"}`);
   } catch (e) {
     console.error("Failed to init database:", e);
   }
 };
+
+export const getDbMode = () => url.startsWith("libsql") ? "Turso" : "Local File";
 
 // Auto-run init
 initDb();

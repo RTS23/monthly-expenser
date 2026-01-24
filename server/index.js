@@ -8,7 +8,8 @@ import passport from './auth.js';
 import {
     getExpenses, addExpense, deleteExpense, updateExpense,
     getAllBudgets, updateUserBudget,
-    getRecurringExpenses, addRecurringExpense, deleteRecurringExpense
+    getRecurringExpenses, addRecurringExpense, deleteRecurringExpense,
+    getDbMode
 } from './database.js';
 import { startBot } from './bot.js';
 import { startScheduler } from './scheduler.js';
@@ -19,6 +20,16 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const isProduction = process.env.NODE_ENV === 'production';
+
+// Status Endpoint
+app.get('/api/status', (req, res) => {
+    res.json({
+        status: 'online',
+        dbMode: getDbMode(),
+        isProduction,
+        timestamp: new Date().toISOString()
+    });
+});
 
 // 1. Secure Headers (Helmet)
 app.use(helmet({
