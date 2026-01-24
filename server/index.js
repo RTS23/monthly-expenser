@@ -118,36 +118,41 @@ app.get('/api/user', (req, res) => {
 
 app.get('/api/expenses', isAuthenticated, async (req, res) => {
     try {
+        console.log(`[GET /api/expenses] Request by User: ${req.user.id} (${req.user.username})`);
         const expenses = await getExpenses();
         const budgets = await getAllBudgets();
 
         if (req.user.isAdmin) {
-            // Admin logic (maybe fetch all monthly budgets for admin?)
-            // For now, keep simple
+            console.log(`[GET /api/expenses] Admin access. Returning all ${expenses.length} expenses.`);
             res.json({ expenses, budgets });
         } else {
             const userExpenses = expenses.filter(e => e.userId === req.user.id);
             const userBudget = budgets.filter(b => b.userId === req.user.id);
-            // Fetch monthly budgets for this user
             const monthlyBudgets = await getUserMonthlyBudgets(req.user.id);
 
+            console.log(`[GET /api/expenses] User access. Found ${userExpenses.length} expenses matching ID ${req.user.id}. Total DB rows: ${expenses.length}`);
             res.json({ expenses: userExpenses, budgets: userBudget, monthlyBudgets });
         }
     } catch (error) {
+        console.error("[GET /api/expenses] Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
 app.post('/api/expenses', isAuthenticated, async (req, res) => {
     try {
+        console.log(`[POST /api/expenses] User: ${req.user.id} (${req.user.username})`);
         const expenseData = {
             ...req.body,
             userId: req.user.id,
             username: req.user.username
         };
+        console.log(`[POST /api/expenses] Saving data:`, JSON.stringify(expenseData));
         const newExpense = await addExpense(expenseData);
+        console.log(`[POST /api/expenses] Success. New ID: ${newExpense.id}`);
         res.status(201).json(newExpense);
     } catch (error) {
+        console.error("[POST /api/expenses] Error:", error);
         res.status(500).json({ error: error.message });
     }
 });

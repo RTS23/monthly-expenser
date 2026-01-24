@@ -11,109 +11,57 @@ const client = createClient({ url, authToken });
 
 // Helper to execute SQL
 const execute = async (sql, args = []) => {
-  return await client.execute({ sql, args });
-};
-
-// Initialize Database
-const initDb = async () => {
   try {
-    await execute(`
-            CREATE TABLE IF NOT EXISTS expenses (
-                id TEXT PRIMARY KEY,
-                amount REAL NOT NULL,
-                category TEXT NOT NULL,
-                title TEXT NOT NULL,
-                date TEXT NOT NULL,
-                userId TEXT DEFAULT NULL,
-                username TEXT DEFAULT NULL,
-                receiptUrl TEXT DEFAULT NULL,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-
-    await execute(`
-            CREATE TABLE IF NOT EXISTS budgets (
-                userId TEXT PRIMARY KEY,
-                username TEXT,
-                amount REAL NOT NULL,
-                lastAlertLevel TEXT DEFAULT 'NONE', 
-                lastAlertMonth TEXT DEFAULT NULL
-            )
-        `);
-
-    await execute(`
-            CREATE TABLE IF NOT EXISTS recurring_expenses (
-                id TEXT PRIMARY KEY,
-                amount REAL NOT NULL,
-                category TEXT NOT NULL,
-                title TEXT NOT NULL,
-                dayOfMonth INTEGER NOT NULL,
-                userId TEXT DEFAULT NULL,
-                username TEXT DEFAULT NULL,
-                lastGeneratedDate TEXT DEFAULT NULL
-            )
-        `);
-    console.log(`Database initialized using: ${url.startsWith("libsql") ? "Turso (Remote)" : "Local File (Ephemeral)"}`);
+    return await client.execute({ sql, args });
   } catch (e) {
-    console.error("Failed to init database:", e);
+    console.error("SQL Execution Error:", e);
+    console.error("Failed SQL:", sql);
+    console.error("Failed Args:", args);
+    throw e;
   }
 };
 
-export const getDbMode = () => url.startsWith("libsql") ? "Turso" : "Local File";
-
-// Auto-run init
-initDb();
-
-export const getRecurringExpenses = async () => {
-  const result = await execute('SELECT * FROM recurring_expenses');
-  return result.rows;
-};
+// ...
 
 export const addRecurringExpense = async (expense) => {
   const id = uuidv4();
   await execute(`
         INSERT INTO recurring_expenses (id, amount, category, title, dayOfMonth, userId, username, lastGeneratedDate)
-        VALUES (:id, :amount, :category, :title, :dayOfMonth, :userId, :username, :lastGeneratedDate)
-    `, {
-    ...expense,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
     id,
-    lastGeneratedDate: null
-  });
+    expense.amount,
+    expense.category,
+    expense.title,
+    expense.dayOfMonth,
+    expense.userId || null,
+    expense.username || null,
+    null
+  ]);
   return { ...expense, id };
 };
 
-export const deleteRecurringExpense = async (id) => {
-  return await execute('DELETE FROM recurring_expenses WHERE id = ?', [id]);
-};
-
-export const updateRecurringExpenseLastGenerated = async (id, date) => {
-  return await execute('UPDATE recurring_expenses SET lastGeneratedDate = ? WHERE id = ?', [date, id]);
-};
-
-export const getExpenses = async () => {
-  const result = await execute('SELECT * FROM expenses ORDER BY date DESC');
-  return result.rows;
-};
+// ...
 
 export const addExpense = async (expense) => {
   const id = uuidv4();
-  const args = {
+  const args = [
     id,
-    amount: expense.amount,
-    category: expense.category,
-    title: expense.title,
-    date: expense.date,
-    userId: expense.userId || null,
-    username: expense.username || null,
-    receiptUrl: expense.receiptUrl || null
-  };
+    expense.amount,
+    expense.category,
+    expense.title,
+    expense.date,
+    expense.userId || null,
+    expense.username || null,
+    expense.receiptUrl || null
+  ];
 
   await execute(`
     INSERT INTO expenses (id, amount, category, title, date, userId, username, receiptUrl)
-    VALUES (:id, :amount, :category, :title, :date, :userId, :username, :receiptUrl)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `, args);
 
-  // Auto-create budget entry if not exists for this user (default 2000)
+  // Auto-create budget entry if not exists for this user (default 0)
   if (expense.userId) {
     const result = await execute('SELECT * FROM budgets WHERE userId = ?', [expense.userId]);
     const userBudget = result.rows[0];
@@ -124,24 +72,22 @@ export const addExpense = async (expense) => {
   return { ...expense, id };
 };
 
-export const deleteExpense = async (id) => {
-  return await execute('DELETE FROM expenses WHERE id = ?', [id]);
-};
+// ...
 
 export const updateExpense = async (id, expense) => {
-  const args = {
-    id,
-    amount: expense.amount,
-    category: expense.category,
-    title: expense.title,
-    date: expense.date,
-    receiptUrl: expense.receiptUrl || null
-  };
+  const args = [
+    expense.amount,
+    expense.category,
+    expense.title,
+    expense.date,
+    expense.receiptUrl || null,
+    id
+  ];
 
   return await execute(`
     UPDATE expenses 
-    SET amount = :amount, category = :category, title = :title, date = :date, receiptUrl = :receiptUrl
-    WHERE id = :id
+    SET amount = ?, category = ?, title = ?, date = ?, receiptUrl = ?
+    WHERE id = ?
   `, args);
 };
 
