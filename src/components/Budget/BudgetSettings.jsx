@@ -26,14 +26,22 @@ const BudgetSettings = () => {
         e.preventDefault();
         let finalBaseAmount;
 
+        console.log('Budget Update - Mode:', mode);
+        console.log('Raw Input:', localBudget);
+        console.log('Current Base Budget:', budget);
+
         if (mode === 'add') {
             // Calculate new total: Current Budget (Base) + Input Amount (Converted to Base)
             const additionalAmountBase = toBaseCurrency(Number(localBudget));
             finalBaseAmount = budget + additionalAmountBase;
+            console.log('Add Mode - Additional (Base):', additionalAmountBase);
         } else {
             // Set new total directly
             finalBaseAmount = toBaseCurrency(Number(localBudget));
+            console.log('Set Mode - New Total (Base):', finalBaseAmount);
         }
+
+        console.log('Final Amount to Save:', finalBaseAmount);
 
         updateBudget(finalBaseAmount);
         setSaved(true);
@@ -93,7 +101,11 @@ const BudgetSettings = () => {
                         </div>
 
                         <button
-                            onClick={() => setIsEditing(true)}
+                            onClick={() => {
+                                setIsEditing(true);
+                                setMode('set');
+                                setLocalBudget(fromBaseCurrency(budget));
+                            }}
                             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-4 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                             {hasBudget ? t('budget.editTitle') : t('budget.addTitle')}
