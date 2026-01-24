@@ -10,7 +10,7 @@ const COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316', '#eab308'
 
 const PersonalAnalytics = () => {
     const { expenses, budget, setIsAddExpenseOpen } = useExpenses();
-    const { t, formatCurrency } = useSettings();
+    const { t, formatCurrency, language } = useSettings();
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
