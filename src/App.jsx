@@ -10,7 +10,6 @@ import AddExpenseForm from './components/Expenses/AddExpenseForm';
 import BudgetSettings from './components/Budget/BudgetSettings';
 import UserFilter from './components/Dashboard/UserFilter';
 import RecurringExpenses from './components/Budget/RecurringExpenses';
-import BudgetCalendar from './components/Budget/BudgetCalendar';
 import GroupAnalytics from './components/Dashboard/GroupAnalytics';
 import PersonalAnalytics from './components/Dashboard/PersonalAnalytics';
 import DateRangeFilter from './components/Dashboard/DateRangeFilter';
@@ -85,7 +84,22 @@ const MainContent = () => {
                                         activeTab === 'budget' ? t('nav.budget') :
                                             language === 'id' ? 'Pengeluaran Rutin' : 'Recurring Expenses'}
                             </h1>
-                            <p className="text-muted text-sm">{t('dashboard.subtitle')}</p>
+                            <p className="text-muted text-sm">
+                                {activeTab === 'dashboard' ? (
+                                    <span>
+                                        {new Date().toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', { weekday: 'short', day: 'numeric', month: 'long' })}
+                                        {' • '}
+                                        <span className="text-indigo-400 font-medium">
+                                            {(() => {
+                                                const today = new Date();
+                                                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                                                const daysLeft = Math.ceil((lastDay - today) / (1000 * 60 * 60 * 24));
+                                                return language === 'id' ? `Reset ${daysLeft} hari lagi` : `Reset in ${daysLeft} days`;
+                                            })()}
+                                        </span>
+                                    </span>
+                                ) : t('dashboard.subtitle')}
+                            </p>
                         </div>
                         <div className="flex-shrink-0">
                             <QuickSettings />
@@ -110,9 +124,6 @@ const MainContent = () => {
                 {activeTab === 'dashboard' && (
                     <div className="space-y-6 animate-in fade-in duration-500">
                         <Overview />
-                        <div data-tour="calendar">
-                            <BudgetCalendar recurringExpenses={recurringExpenses} />
-                        </div>
 
                         {selectedUser || !isAdmin ? (
                             <>
