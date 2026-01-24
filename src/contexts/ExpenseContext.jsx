@@ -76,7 +76,7 @@ export function ExpenseProvider({ children }) {
             if (e.username) {
                 const normalized = e.username.toLowerCase();
                 if (!uniqueUserBudgets.has(normalized)) {
-                    uniqueUserBudgets.set(normalized, 2000); // Default for users without set budget
+                    uniqueUserBudgets.set(normalized, 0); // Default for users without set budget
                 }
             }
         });
@@ -86,11 +86,11 @@ export function ExpenseProvider({ children }) {
             total += amount;
         });
 
-        return total > 0 ? total : 2000;
+        return total > 0 ? total : 0;
     };
 
     const currentBudget = selectedUser
-        ? (budgets[selectedUser] || 2000)
+        ? (budgets[selectedUser] || 0)
         : calculateGlobalBudget();
 
     // Filter by User
