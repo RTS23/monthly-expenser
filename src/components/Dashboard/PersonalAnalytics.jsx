@@ -58,6 +58,38 @@ const PersonalAnalytics = () => {
         });
     }, [expenses]);
 
+    // Empty State: Show clear CTA instead of empty charts
+    if (expenses.length === 0) {
+        return (
+            <div className="glass-panel p-8 sm:p-12 rounded-2xl text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto relative group cursor-pointer" onClick={() => setIsAddExpenseOpen(true)}>
+                    <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-xl animate-pulse" />
+                    <span className="text-4xl sm:text-5xl relative z-10 group-hover:scale-110 transition-transform">🚀</span>
+                </div>
+
+                <div className="max-w-md mx-auto space-y-2">
+                    <h3 className="text-xl sm:text-2xl font-bold text-main">
+                        {t('tour.welcome') || "Welcome to Etoile!"}
+                    </h3>
+                    <p className="text-muted text-sm sm:text-base leading-relaxed">
+                        {language === 'id'
+                            ? "Mulai perjalanan finansialmu sekarang. Catat pengeluaran pertamamu untuk melihat analisis di sini."
+                            : "Start your financial journey. Track your first expense to unlock powerful insights and analytics here."
+                        }
+                    </p>
+                </div>
+
+                <button
+                    onClick={() => setIsAddExpenseOpen(true)}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-105 active:scale-95"
+                >
+                    <span className="text-lg">+</span>
+                    {t('dashboard.addExpense') || "Add Expense"}
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-500">
             {/* Category Distribution */}
@@ -68,55 +100,32 @@ const PersonalAnalytics = () => {
                     {t('analytics.spendingByCategory')}
                 </h3>
                 <div className="h-[250px] w-full relative z-10 flex flex-col items-center justify-center">
-                    {categoryData.length > 0 ? (
-                        <>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={categoryData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {categoryData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            {/* Center Text */}
-                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-3xl font-bold text-main">
-                                    {categoryData.length}
-                                </span>
-                                <span className="text-xs text-muted uppercase tracking-wider">{t('analytics.categories')}</span>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="text-center space-y-3 animate-in fade-in zoom-in duration-500">
-                            <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-2 relative">
-                                <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-xl animate-pulse" />
-                                <span className="text-2xl relative z-10">🚀</span>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-main">Start Your Journey!</h4>
-                                <p className="text-xs text-muted max-w-[200px] mx-auto">
-                                    Track your first expense to unlock insights.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setIsAddExpenseOpen(true)}
-                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95"
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={categoryData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={60}
+                                outerRadius={80}
+                                paddingAngle={5}
+                                dataKey="value"
+                                stroke="none"
                             >
-                                {t('dashboard.addExpense')}
-                            </button>
-                        </div>
-                    )}
+                                {categoryData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                    </ResponsiveContainer>
+                    {/* Center Text */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-3xl font-bold text-main">
+                            {categoryData.length}
+                        </span>
+                        <span className="text-xs text-muted uppercase tracking-wider">{t('analytics.categories')}</span>
+                    </div>
                 </div>
             </div>
 
