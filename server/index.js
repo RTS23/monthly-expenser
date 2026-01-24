@@ -250,7 +250,7 @@ app.delete('/api/recurring/:id', isAuthenticated, async (req, res) => {
 });
 
 // Start Discord Bot
-// startBot(); // Disabled locally to prevent double-replies
+startBot();
 startScheduler();
 
 // Configure Multer for file uploads
