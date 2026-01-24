@@ -62,7 +62,7 @@ const BudgetWarningEffect = () => {
 
 const MainContent = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const { users, selectedUser, setSelectedUser, recurringExpenses } = useExpenses();
+    const { users, selectedUser, setSelectedUser, recurringExpenses, expenses } = useExpenses();
     const { isAdmin } = useAuth();
     const { t, language } = useSettings();
 
@@ -128,24 +128,28 @@ const MainContent = () => {
                         {selectedUser || !isAdmin ? (
                             <>
                                 <PersonalAnalytics />
-                                <div className="mt-8">
-                                    <div className="flex justify-between items-center mb-4 px-2">
-                                        <h3 className="text-lg font-semibold text-white">
-                                            {selectedUser ? `${selectedUser}'s Activity` : t('dashboard.recentActivity')}
-                                        </h3>
+                                {expenses.length > 0 && (
+                                    <div className="mt-8">
+                                        <div className="flex justify-between items-center mb-4 px-2">
+                                            <h3 className="text-lg font-semibold text-white">
+                                                {selectedUser ? `${selectedUser}'s Activity` : t('dashboard.recentActivity')}
+                                            </h3>
+                                        </div>
+                                        <ExpenseList />
                                     </div>
-                                    <ExpenseList />
-                                </div>
+                                )}
                             </>
                         ) : (
                             <>
                                 <GroupAnalytics />
-                                <div className="mt-8">
-                                    <div className="flex justify-between items-center mb-4 px-2">
-                                        <h3 className="text-lg font-semibold text-white">{t('dashboard.recentGroupActivity')}</h3>
+                                {expenses.length > 0 && (
+                                    <div className="mt-8">
+                                        <div className="flex justify-between items-center mb-4 px-2">
+                                            <h3 className="text-lg font-semibold text-white">{t('dashboard.recentGroupActivity')}</h3>
+                                        </div>
+                                        <ExpenseList />
                                     </div>
-                                    <ExpenseList />
-                                </div>
+                                )}
                             </>
                         )}
                     </div>
