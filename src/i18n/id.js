@@ -67,7 +67,12 @@ export const id = {
         editTitle: 'Edit Anggaran',
         noBudget: 'Belum ada anggaran',
         cancel: 'Batal',
-        save: 'Simpan'
+        save: 'Simpan',
+        setMode: 'Atur Ulang',
+        addMode: 'Tambah Dana',
+        current: 'Saat Ini',
+        add: 'Tambah',
+        newTotal: 'Total Baru'
     },
 
     // Pengaturan

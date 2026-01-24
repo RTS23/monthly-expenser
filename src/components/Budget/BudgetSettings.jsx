@@ -114,7 +114,7 @@ const BudgetSettings = () => {
                                 }}
                                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === 'set' ? 'bg-indigo-600 text-white shadow-lg' : 'text-muted hover:text-white'}`}
                             >
-                                {t('budget.setMode') || (language === 'id' ? 'Atur Ulang' : 'Set New')}
+                                {t('budget.setMode')}
                             </button>
                             <button
                                 type="button"
@@ -124,16 +124,13 @@ const BudgetSettings = () => {
                                 }}
                                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === 'add' ? 'bg-indigo-600 text-white shadow-lg' : 'text-muted hover:text-white'}`}
                             >
-                                {t('budget.addMode') || (language === 'id' ? 'Tambah Dana' : 'Add Funds')}
+                                {t('budget.addMode')}
                             </button>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-main mb-2">
-                                {mode === 'set'
-                                    ? (t('budget.editTitle') || (language === 'id' ? 'Total Anggaran' : 'Total Budget'))
-                                    : (language === 'id' ? 'Jumlah Tambahan' : 'Additional Amount')
-                                }
+                                {mode === 'set' ? t('budget.editTitle') : t('budget.addTitle')}
                             </label>
                             <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-semibold">{currencySymbol}</span>
@@ -161,19 +158,19 @@ const BudgetSettings = () => {
                             </div>
 
                             {/* Preview Calculation for Add Mode */}
-                            {mode === 'add' && localBudget > 0 && (
+                            {mode === 'add' && Number(localBudget) > 0 && (
                                 <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-muted">{language === 'id' ? 'Saat Ini:' : 'Current:'}</span>
+                                        <span className="text-muted">{t('budget.current')}:</span>
                                         <span className="text-main">{formatCurrency(budget)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm mt-1">
-                                        <span className="text-emerald-400">+ {language === 'id' ? 'Tambah:' : 'Add:'}</span>
+                                        <span className="text-emerald-400">+ {t('budget.add')}:</span>
                                         <span className="text-emerald-400">{formatCurrency(toBaseCurrency(localBudget), true)}</span>
                                     </div>
                                     <div className="border-t border-indigo-500/20 my-2"></div>
                                     <div className="flex justify-between font-bold">
-                                        <span className="text-indigo-300">{language === 'id' ? 'Total Baru:' : 'New Total:'}</span>
+                                        <span className="text-indigo-300">{t('budget.newTotal')}:</span>
                                         <span className="text-indigo-300">
                                             {formatCurrency(budget + toBaseCurrency(Number(localBudget)), true)}
                                         </span>

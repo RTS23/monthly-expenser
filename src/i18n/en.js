@@ -67,7 +67,12 @@ export const en = {
         editTitle: 'Edit Budget',
         noBudget: 'No budget set',
         cancel: 'Cancel',
-        save: 'Save'
+        save: 'Save',
+        setMode: 'Set New',
+        addMode: 'Add Funds',
+        current: 'Current',
+        add: 'Add',
+        newTotal: 'New Total'
     },
 
     // Settings
