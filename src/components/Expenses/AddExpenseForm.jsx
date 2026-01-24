@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const AddExpenseForm = () => {
-    const { addExpense, isAddExpenseOpen, setIsAddExpenseOpen } = useExpenses();
+    const { addExpense, isAddExpenseOpen, setIsAddExpenseOpen, expenses } = useExpenses();
     const { t, currency, toBaseCurrency, getCurrencySymbol, exchangeRate } = useSettings();
     // const [isOpen, setIsOpen] = useState(false); // Removed local state
     const [formData, setFormData] = useState({
@@ -51,6 +51,9 @@ const AddExpenseForm = () => {
 
     // Floating Action Button - Clean Modern Design
     if (!isAddExpenseOpen) {
+        // Hide FAB if expenses are empty (Clean Slate mode uses the big card instead)
+        if (expenses.length === 0) return null;
+
         return (
             <button
                 onClick={() => setIsAddExpenseOpen(true)}
