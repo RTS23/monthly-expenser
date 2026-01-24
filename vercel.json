@@ -11,6 +11,10 @@
         {
             "source": "/uploads/:path*",
             "destination": "https://monthly-expenser.onrender.com/uploads/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ]
 }
