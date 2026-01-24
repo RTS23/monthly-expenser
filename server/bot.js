@@ -249,7 +249,7 @@ client.on(Events.MessageCreate, async message => {
     // !help
     if (command === 'help') {
         message.reply(`
-**🤖 Monthly Expense Bot Commands**
+**🤖 Etoile Bot Commands**
 
 **📝 LOGGING & MANAGING**
 • \`!log <amount> <category> [note]\` - Add expense (attach receipt!)

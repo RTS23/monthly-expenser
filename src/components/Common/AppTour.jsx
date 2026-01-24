@@ -59,7 +59,7 @@ const AppTour = () => {
             target: 'body',
             content: (
                 <div>
-                    <strong>Welcome to SpendSync! 👋</strong>
+                    <strong>Welcome to Etoile! 👋</strong>
                     <p style={{ marginTop: 8 }}>Let's take a quick tour.</p>
                 </div>
             ),

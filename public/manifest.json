@@ -1,6 +1,6 @@
 {
-    "name": "SpendSync - Expense Tracker",
-    "short_name": "SpendSync",
+    "name": "Etoile",
+    "short_name": "Etoile",
     "description": "Track your expenses and sync with Discord. Stay on budget with smart spending insights.",
     "start_url": "/",
     "display": "standalone",

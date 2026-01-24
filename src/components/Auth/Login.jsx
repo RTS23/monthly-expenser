@@ -32,8 +32,8 @@ const Login = ({ onLogin }) => {
                 </div>
 
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">SpendSync</h1>
-                    <p className="text-slate-400">Track expenses. Sync with Discord. Stay on budget.</p>
+                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Etoile</h1>
+                    <p className="text-slate-400">Welcome to <span className="text-indigo-400">Etoile</span>. Sync with Discord. Stay on budget.</p>
                 </div>
 
                 <button

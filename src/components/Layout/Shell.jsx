@@ -3,21 +3,13 @@ import { LayoutDashboard, Wallet, CreditCard, LogOut, ChevronDown, Repeat, Menu,
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 
-// SpendSync Logo Component
+// Etoile Logo Component
 const Logo = ({ size = 'md' }) => (
-    <svg viewBox="0 0 32 32" className={size === 'sm' ? 'w-8 h-8' : 'w-10 h-10'}>
-        <defs>
-            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#6366f1' }} />
-                <stop offset="100%" style={{ stopColor: '#a855f7' }} />
-            </linearGradient>
-        </defs>
-        <rect width="32" height="32" rx="8" fill="#0f172a" />
-        <path d="M22 12c0-3.3-2.7-6-6-6s-6 2.7-6 6" stroke="url(#logoGrad)" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <path d="M10 20c0 3.3 2.7 6 6 6s6-2.7 6-6" stroke="url(#logoGrad)" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <circle cx="10" cy="12" r="2" fill="url(#logoGrad)" />
-        <circle cx="22" cy="20" r="2" fill="url(#logoGrad)" />
-    </svg>
+    <img
+        src="/logo.png"
+        alt="Etoile Logo"
+        className={`${size === 'sm' ? 'w-8 h-8' : 'w-10 h-10'} object-contain`}
+    />
 );
 
 const Shell = ({ children, activeTab, onTabChange }) => {
@@ -62,7 +54,7 @@ const Shell = ({ children, activeTab, onTabChange }) => {
                 </button>
                 <div className="flex items-center gap-2">
                     <Logo size="sm" />
-                    <span className="font-bold text-sm text-main">SpendSync</span>
+                    <span className="font-bold text-sm text-main">Etoile</span>
                 </div>
                 <div className="w-10" /> {/* Spacer for centering */}
             </div>
@@ -93,12 +85,12 @@ const Shell = ({ children, activeTab, onTabChange }) => {
 
                 {/* Logo */}
                 <div className="px-4 mb-8 lg:mb-12 flex items-center gap-3">
-                    <div className="flex-shrink-0 shadow-lg shadow-indigo-500/20 rounded-xl">
+                    <div className="flex-shrink-0 shadow-lg shadow-indigo-500/20 rounded-xl overflow-hidden">
                         <Logo />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-xl tracking-tight text-main">SpendSync</span>
-                        <span className="text-[10px] text-muted uppercase tracking-wider">Expense Tracker</span>
+                        <span className="font-bold text-xl tracking-tight text-main">Etoile</span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider">Financial Star</span>
                     </div>
                 </div>
 
