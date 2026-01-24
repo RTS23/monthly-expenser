@@ -160,12 +160,35 @@ export function ExpenseProvider({ children }) {
     const users = [...new Set(expenses.map(e => e.username).filter(Boolean))];
 
     // Derived Budget Logic
+    // Derived Budget Logic
     const calculateGlobalBudget = () => {
         let total = 0;
-        const allKnownUsers = new Set([...users, ...Object.keys(budgets)]);
 
-        allKnownUsers.forEach(user => {
-            total += (budgets[user] || 2000);
+        // Use a map to track unique users (case-insensitive)
+        const uniqueUserBudgets = new Map();
+
+        // 1. Add explicitly set budgets
+        Object.entries(budgets).forEach(([username, amount]) => {
+            if (username) {
+                const normalized = username.toLowerCase();
+                // Overwrite if exists, so we keep the explicit value
+                uniqueUserBudgets.set(normalized, amount);
+            }
+        });
+
+        // 2. Check users from expenses for any defaults needed
+        expenses.forEach(e => {
+            if (e.username) {
+                const normalized = e.username.toLowerCase();
+                if (!uniqueUserBudgets.has(normalized)) {
+                    uniqueUserBudgets.set(normalized, 2000); // Default for users without set budget
+                }
+            }
+        });
+
+        // 3. Sum values
+        uniqueUserBudgets.forEach(amount => {
+            total += amount;
         });
 
         return total > 0 ? total : 2000;
