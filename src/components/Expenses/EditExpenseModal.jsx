@@ -21,25 +21,76 @@ const EditExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
         date: ''
     });
 
+    // Helper to format amount for display (e.g. 100000 -> 100.000)
+    const formatDisplayAmount = (value) => {
+        if (!value && value !== 0) return '';
+        // Remove existing non-numeric chars first to prevent double formatting issues during typing
+        const num = Number(String(value).replace(/[^0-9.-]+/g, ''));
+        if (isNaN(num)) return value; // Return original if not a number
+
+        return new Intl.NumberFormat(currency === 'IDR' ? 'id-ID' : 'en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: currency === 'IDR' ? 0 : 2,
+            useGrouping: true
+        }).format(num);
+    };
+
+    // Helper to parse formatted input back to number (e.g. 100.000 -> 100000)
+    const parseInputAmount = (value) => {
+        if (!value) return 0;
+        // For IDR (uses dots for thousands), remove dots. For ISO/English (commas), remove commas.
+        // Simple approach: remove all non-numeric characters except '.'(decimal) if USD, or nothing if IDR
+        if (currency === 'IDR') {
+            return Number(value.replace(/\./g, ''));
+        }
+        return Number(value.replace(/,/g, ''));
+    };
+
     useEffect(() => {
         if (expense) {
             // Convert from base currency (USD in DB) to display currency
             const displayAmount = fromBaseCurrency(expense.amount || 0);
+            const initialAmount = currency === 'IDR' ? Math.round(displayAmount) : displayAmount;
+
             setFormData({
                 title: expense.title || '',
-                amount: currency === 'IDR' ? Math.round(displayAmount) : displayAmount,
+                amount: formatDisplayAmount(initialAmount),
                 category: expense.category || 'Food',
                 date: expense.date ? expense.date.split('T')[0] : ''
             });
         }
     }, [expense, currency, fromBaseCurrency]);
 
+    const handleAmountChange = (e) => {
+        const value = e.target.value;
+
+        // Allow only numbers and separators
+        const cleanValue = value.replace(/[^0-9.,]/g, '');
+
+        // Remove separators to get raw number string
+        const rawValue = currency === 'IDR'
+            ? cleanValue.replace(/\./g, '')
+            : cleanValue.replace(/,/g, '');
+
+        if (rawValue === '' || !isNaN(rawValue)) {
+            // For IDR, format immediately as integer. For USD, allow decimal typing
+            if (currency === 'IDR') {
+                setFormData({ ...formData, amount: formatDisplayAmount(rawValue) });
+            } else {
+                setFormData({ ...formData, amount: cleanValue });
+            }
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!formData.title || !formData.amount) return;
 
+        // Parse formatted string back to number
+        const numericAmount = parseInputAmount(formData.amount);
+
         // Convert back to base currency (USD) for storage
-        const baseAmount = toBaseCurrency(Number(formData.amount));
+        const baseAmount = toBaseCurrency(numericAmount);
 
         onSave({
             ...expense,
@@ -111,17 +162,17 @@ const EditExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                             {language === 'id' ? 'Jumlah' : 'Amount'}
                         </label>
                         <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             value={formData.amount}
-                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                            onChange={handleAmountChange}
+                            placeholder={currency === 'IDR' ? '0' : '0.00'}
                             className={`w-full px-4 py-2.5 rounded-xl border transition-colors
                                 ${isDark
                                     ? 'bg-slate-800 border-slate-700 text-white focus:border-indigo-500'
                                     : 'bg-white border-slate-200 text-slate-900 focus:border-indigo-500'
                                 }
                             `}
-                            min="0"
-                            step="0.01"
                             required
                         />
                     </div>
