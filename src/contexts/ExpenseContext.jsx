@@ -357,7 +357,6 @@ export function ExpenseProvider({ children }) {
         exportToCSV,
         budgets,
         monthlyBudgets,
-        monthlyBudgets,
         savings,
         isAddExpenseOpen,
         setIsAddExpenseOpen
