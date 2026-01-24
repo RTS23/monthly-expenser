@@ -55,6 +55,24 @@ const SavingsCard = () => {
                     }
                 </p>
             </div>
+
+            {/* Reset Info Badge */}
+            <div className="mt-3 flex items-center justify-between text-xs text-muted">
+                <span>
+                    {language === 'id' ? 'Reset Anggaran:' : 'Next Reset:'}
+                </span>
+                <span className="font-medium text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-lg">
+                    {(() => {
+                        const today = new Date();
+                        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                        const daysLeft = Math.ceil((lastDay - today) / (1000 * 60 * 60 * 24));
+
+                        if (daysLeft === 0) return language === 'id' ? 'Malam Ini' : 'Tonight';
+                        if (daysLeft === 1) return language === 'id' ? 'Besok' : 'Tomorrow';
+                        return language === 'id' ? `${daysLeft} Hari Lagi` : `in ${daysLeft} Days`;
+                    })()}
+                </span>
+            </div>
         </div>
     );
 };

@@ -10,6 +10,7 @@ import AddExpenseForm from './components/Expenses/AddExpenseForm';
 import BudgetSettings from './components/Budget/BudgetSettings';
 import UserFilter from './components/Dashboard/UserFilter';
 import RecurringExpenses from './components/Budget/RecurringExpenses';
+import BudgetCalendar from './components/Budget/BudgetCalendar';
 import GroupAnalytics from './components/Dashboard/GroupAnalytics';
 import PersonalAnalytics from './components/Dashboard/PersonalAnalytics';
 import DateRangeFilter from './components/Dashboard/DateRangeFilter';
@@ -62,7 +63,7 @@ const BudgetWarningEffect = () => {
 
 const MainContent = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const { users, selectedUser, setSelectedUser } = useExpenses();
+    const { users, selectedUser, setSelectedUser, recurringExpenses } = useExpenses();
     const { isAdmin } = useAuth();
     const { t, language } = useSettings();
 
@@ -109,6 +110,9 @@ const MainContent = () => {
                 {activeTab === 'dashboard' && (
                     <div className="space-y-6 animate-in fade-in duration-500">
                         <Overview />
+                        <div data-tour="calendar">
+                            <BudgetCalendar recurringExpenses={recurringExpenses} />
+                        </div>
 
                         {selectedUser || !isAdmin ? (
                             <>
