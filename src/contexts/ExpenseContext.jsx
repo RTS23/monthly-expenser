@@ -36,6 +36,7 @@ export function ExpenseProvider({ children }) {
     const fetchData = async () => {
         try {
             const res = await fetch(`${API_URL}/expenses`, { credentials: 'include' });
+            if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
             const data = await res.json();
             const { expenses: fetchedExpenses, budgets: fetchedBudgets, monthlyBudgets: fetchedMonthly } = data;
 
