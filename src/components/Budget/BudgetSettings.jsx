@@ -14,13 +14,31 @@ const BudgetSettings = () => {
     const [mode, setMode] = useState('set'); // 'set' or 'add'
 
     // Sync local budget only when not editing, or on initial load
+    // Sync local budget only when not editing
     useEffect(() => {
         if (!isEditing) {
             setLocalBudget(fromBaseCurrency(budget));
-            setMode('set'); // Reset mode when closed
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         }
-    }, [budget, currency, exchangeRate, isEditing, fromBaseCurrency]); // Added dependency
+    }, [budget, isEditing, fromBaseCurrency]);
+
+    const handleOpenModal = () => {
+        setIsEditing(true);
+        setMode('set'); // Always start in Set mode
+        setLocalBudget(fromBaseCurrency(budget)); // Always load current budget
+        console.log('Opened Budget Modal: Mode set to SET, Budget loaded.');
+    };
+
+    const handleSwitchToSet = () => {
+        setMode('set');
+        setLocalBudget(fromBaseCurrency(budget));
+        console.log('Switched to SET Mode');
+    };
+
+    const handleSwitchToAdd = () => {
+        setMode('add');
+        setLocalBudget('');
+        console.log('Switched to ADD Mode');
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -101,11 +119,7 @@ const BudgetSettings = () => {
                         </div>
 
                         <button
-                            onClick={() => {
-                                setIsEditing(true);
-                                setMode('set');
-                                setLocalBudget(fromBaseCurrency(budget));
-                            }}
+                            onClick={handleOpenModal}
                             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-4 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                             {hasBudget ? t('budget.editTitle') : t('budget.addTitle')}
@@ -120,20 +134,14 @@ const BudgetSettings = () => {
                         <div className="flex bg-slate-800/50 p-1 rounded-xl">
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setMode('set');
-                                    setLocalBudget(fromBaseCurrency(budget));
-                                }}
+                                onClick={handleSwitchToSet}
                                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === 'set' ? 'bg-indigo-600 text-white shadow-lg' : 'text-muted hover:text-white'}`}
                             >
                                 {t('budget.setMode')}
                             </button>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setMode('add');
-                                    setLocalBudget('');
-                                }}
+                                onClick={handleSwitchToAdd}
                                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === 'add' ? 'bg-indigo-600 text-white shadow-lg' : 'text-muted hover:text-white'}`}
                             >
                                 {t('budget.addMode')}
