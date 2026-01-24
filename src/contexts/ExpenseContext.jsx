@@ -25,6 +25,9 @@ export function ExpenseProvider({ children }) {
     const [recurringExpenses, setRecurringExpenses] = useState([]);
     const [monthlyBudgets, setMonthlyBudgets] = useState([]);
 
+    // Global Add Expense Modal State
+    const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+
     // Load from API on mount
     useEffect(() => {
         fetchData();
@@ -354,7 +357,10 @@ export function ExpenseProvider({ children }) {
         exportToCSV,
         budgets,
         monthlyBudgets,
-        savings
+        monthlyBudgets,
+        savings,
+        isAddExpenseOpen,
+        setIsAddExpenseOpen
     };
 
     return (

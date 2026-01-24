@@ -9,7 +9,7 @@ import {
 const COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316', '#eab308'];
 
 const PersonalAnalytics = () => {
-    const { expenses, budget } = useExpenses();
+    const { expenses, budget, setIsAddExpenseOpen } = useExpenses();
     const { t, formatCurrency } = useSettings();
 
     const CustomTooltip = ({ active, payload, label }) => {
@@ -67,33 +67,56 @@ const PersonalAnalytics = () => {
                     <div className="w-2 h-6 bg-indigo-500 rounded-full" />
                     {t('analytics.spendingByCategory')}
                 </h3>
-                <div className="h-[250px] w-full relative z-10">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={categoryData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                paddingAngle={5}
-                                dataKey="value"
-                                stroke="none"
+                <div className="h-[250px] w-full relative z-10 flex flex-col items-center justify-center">
+                    {categoryData.length > 0 ? (
+                        <>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={categoryData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                        stroke="none"
+                                    >
+                                        {categoryData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip />} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                            {/* Center Text */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-3xl font-bold text-main">
+                                    {categoryData.length}
+                                </span>
+                                <span className="text-xs text-muted uppercase tracking-wider">{t('analytics.categories')}</span>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="text-center space-y-3 animate-in fade-in zoom-in duration-500">
+                            <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-2 relative">
+                                <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-xl animate-pulse" />
+                                <span className="text-2xl relative z-10">🚀</span>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-main">Start Your Journey!</h4>
+                                <p className="text-xs text-muted max-w-[200px] mx-auto">
+                                    Track your first expense to unlock insights.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsAddExpenseOpen(true)}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95"
                             >
-                                {categoryData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                    </ResponsiveContainer>
-                    {/* Center Text */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-3xl font-bold text-main">
-                            {categoryData.length}
-                        </span>
-                        <span className="text-xs text-muted uppercase tracking-wider">{t('analytics.categories')}</span>
-                    </div>
+                                {t('dashboard.addExpense')}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 

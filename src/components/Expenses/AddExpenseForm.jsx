@@ -15,9 +15,9 @@ const CATEGORIES = [
 ];
 
 const AddExpenseForm = () => {
-    const { addExpense } = useExpenses();
+    const { addExpense, isAddExpenseOpen, setIsAddExpenseOpen } = useExpenses();
     const { t, currency, toBaseCurrency, getCurrencySymbol, exchangeRate } = useSettings();
-    const [isOpen, setIsOpen] = useState(false);
+    // const [isOpen, setIsOpen] = useState(false); // Removed local state
     const [formData, setFormData] = useState({
         title: '',
         amount: '',
@@ -44,16 +44,16 @@ const AddExpenseForm = () => {
             date: new Date().toISOString().split('T')[0],
             receiptUrl: null
         });
-        setIsOpen(false);
+        setIsAddExpenseOpen(false);
     };
 
     const currencySymbol = getCurrencySymbol();
 
     // Floating Action Button - Clean Modern Design
-    if (!isOpen) {
+    if (!isAddExpenseOpen) {
         return (
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={() => setIsAddExpenseOpen(true)}
                 data-tour="add-expense-btn"
                 className="fixed bottom-6 right-6 group z-40"
             >
@@ -75,7 +75,7 @@ const AddExpenseForm = () => {
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsAddExpenseOpen(false)}
             />
 
             {/* Modal with border gradient */}
@@ -88,7 +88,7 @@ const AddExpenseForm = () => {
                             {t('addExpenseForm.title')}
                         </h3>
                         <button
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => setIsAddExpenseOpen(false)}
                             className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors hover:rotate-90 duration-300"
                         >
                             <X size={18} />
