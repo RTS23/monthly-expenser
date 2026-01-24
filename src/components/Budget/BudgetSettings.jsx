@@ -185,18 +185,22 @@ const BudgetSettings = () => {
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-semibold">{currencySymbol}</span>
                                 <input
                                     type="text"
-                                    inputMode="numeric"
+                                    inputMode="decimal"
                                     value={localBudget === '' ? '' : (currency === 'IDR'
-                                        ? Math.round(Number(localBudget)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                                        ? Number(localBudget).toLocaleString('id-ID')
                                         : localBudget)
                                     }
                                     onChange={(e) => {
-                                        const rawValue = currency === 'IDR'
-                                            ? e.target.value.replace(/\./g, '')
-                                            : e.target.value.replace(/,/g, '');
+                                        let val = e.target.value;
+                                        if (currency === 'IDR') {
+                                            val = val.replace(/\./g, '');
+                                            if (!/^\d*$/.test(val)) return;
+                                        } else {
+                                            val = val.replace(/,/g, '');
+                                        }
 
-                                        if (!isNaN(rawValue)) {
-                                            setLocalBudget(rawValue);
+                                        if (!isNaN(val)) {
+                                            setLocalBudget(val);
                                         }
                                     }}
                                     className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-4 text-xl font-bold text-main focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"

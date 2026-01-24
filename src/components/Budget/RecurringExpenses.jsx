@@ -192,15 +192,28 @@ const RecurringExpenses = () => {
                                     {language === 'id' ? 'Jumlah' : 'Amount'}
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
+                                    inputMode="decimal"
                                     required
-                                    min="0"
-                                    value={formData.amount}
-                                    onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border bg-transparent text-main
+                                    value={(() => {
+                                        if (!formData.amount) return '';
+                                        if (language === 'id') {
+                                            return Number(formData.amount).toLocaleString('id-ID');
+                                        }
+                                        return formData.amount;
+                                    })()}
+                                    onChange={e => {
+                                        let val = e.target.value;
+                                        if (language === 'id') {
+                                            val = val.replace(/\./g, '');
+                                            if (!/^\d*$/.test(val)) return;
+                                        }
+                                        setFormData({ ...formData, amount: val });
+                                    }}
+                                    className={`w-full px-4 py-3 rounded-xl border bg-transparent text-main font-mono
                                         ${isDark ? 'border-slate-600 focus:border-indigo-500' : 'border-slate-300 focus:border-indigo-500'}
                                     `}
-                                    placeholder="0"
+                                    placeholder={language === 'id' ? '50.000' : '0.00'}
                                 />
                             </div>
 
