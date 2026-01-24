@@ -125,7 +125,7 @@ export function ExpenseProvider({ children }) {
             if (res.ok) {
                 const newExpense = await res.json();
                 setExpenses(prev => [newExpense, ...prev]); // Optimistic update (prepend to top)
-                fetchData(); // Background sync
+                setTimeout(() => fetchData(), 500); // 500ms delay to ensure DB consistency
                 return true;
             }
             return false;
