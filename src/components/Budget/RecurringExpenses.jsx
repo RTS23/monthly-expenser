@@ -36,33 +36,20 @@ const CategoryIcon = ({ category }) => {
 
 const RecurringExpenses = () => {
     const { recurringExpenses, addRecurringExpense, deleteRecurringExpense } = useExpenses();
-    const { t, formatCurrency, theme, language } = useSettings();
+    const { t, formatCurrency, theme, language, currency, toBaseCurrency } = useSettings(); // Added currency, toBaseCurrency
     const isDark = theme === 'dark';
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
-    const [formData, setFormData] = useState({
-        title: '',
-        amount: '',
-        category: 'Housing',
-        dayOfMonth: '1'
-    });
-
-    const categories = [
-        { id: 'Food', label: 'Food' },
-        { id: 'Shopping', label: 'Shopping' },
-        { id: 'Housing', label: 'Housing' },
-        { id: 'Transport', label: 'Transport' },
-        { id: 'Utilities', label: 'Utilities' },
-        { id: 'Entertainment', label: 'Entertainment' },
-        { id: 'Other', label: 'Other' }
-    ];
+    // ...
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Convert to base currency if needed
+        const baseAmount = toBaseCurrency(Number(formData.amount));
+
         addRecurringExpense({
             title: formData.title,
-            amount: Number(formData.amount),
+            amount: baseAmount,
             category: formData.category,
             dayOfMonth: Number(formData.dayOfMonth)
         });

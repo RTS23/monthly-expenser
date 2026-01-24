@@ -85,12 +85,12 @@ const BudgetHistory = () => {
                     </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                     <div>
                         <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             {language === 'id' ? 'Anggaran' : 'Budget'}
                         </p>
-                        <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'} break-all`}>
                             {formatCurrency(currentMonthData.budget)}
                         </p>
                     </div>
@@ -98,7 +98,7 @@ const BudgetHistory = () => {
                         <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             {language === 'id' ? 'Terpakai' : 'Spent'}
                         </p>
-                        <p className={`text-lg font-bold ${getStatusColor(currentMonthData.percentage)}`}>
+                        <p className={`text-lg font-bold ${getStatusColor(currentMonthData.percentage)} break-all`}>
                             {formatCurrency(currentMonthData.spent)}
                         </p>
                     </div>
@@ -106,7 +106,7 @@ const BudgetHistory = () => {
                         <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             {language === 'id' ? 'Sisa' : 'Remaining'}
                         </p>
-                        <p className={`text-lg font-bold ${currentMonthData.remaining >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                        <p className={`text-lg font-bold ${currentMonthData.remaining >= 0 ? 'text-emerald-500' : 'text-red-500'} break-all`}>
                             {formatCurrency(Math.abs(currentMonthData.remaining))}
                             {currentMonthData.remaining < 0 && <span className="text-xs ml-1">{language === 'id' ? '(lebih)' : '(over)'}</span>}
                         </p>

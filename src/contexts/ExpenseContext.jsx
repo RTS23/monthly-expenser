@@ -1,206 +1,39 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
-const ExpenseContext = createContext();
-
-export function useExpenses() {
-    return useContext(ExpenseContext);
-}
-
-// Use relative URL in production, localhost in development
-const API_URL = import.meta.env.PROD
-    ? '/api'
-    : 'http://localhost:3001/api';
+// ... (imports)
 
 export function ExpenseProvider({ children }) {
+    const { user } = useAuth(); // Get authenticated user
     const [expenses, setExpenses] = useState([]);
     const [budgets, setBudgets] = useState({}); // Map of userId -> { amount, username }
-    const [defaultBudget, setDefaultBudget] = useState(2000);
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [dateRange, setDateRange] = useState(null); // Date range filter { start, end }
-    const [searchQuery, setSearchQuery] = useState(''); // Search filter
-    const [categoryFilter, setCategoryFilter] = useState(null); // Category filter
-    const [amountRange, setAmountRange] = useState({ min: null, max: null }); // Amount range filter
+    const [defaultBudget, setDefaultBudget] = useState(0); // Default 0 for new users
+    // ...
 
-    const [recurringExpenses, setRecurringExpenses] = useState([]);
-    const [monthlyBudgets, setMonthlyBudgets] = useState([]);
-
-    // Global Add Expense Modal State
-    const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
-
-    // Load from API on mount
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const res = await fetch(`${API_URL}/expenses`, { credentials: 'include' });
-            if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-            const data = await res.json();
-            const { expenses: fetchedExpenses, budgets: fetchedBudgets, monthlyBudgets: fetchedMonthly } = data;
-
-            setExpenses(fetchedExpenses || []);
-
-            const budgetMap = {};
-            if (fetchedBudgets) {
-                fetchedBudgets.forEach(b => {
-                    budgetMap[b.username] = b.amount;
-                });
-            }
-            setBudgets(budgetMap);
-
-            if (Array.isArray(fetchedMonthly)) {
-                setMonthlyBudgets(fetchedMonthly);
-            }
-
-            // Fetch recurring expenses
-            const recRes = await fetch(`${API_URL}/recurring`, { credentials: 'include' });
-            if (recRes.ok) {
-                const recData = await recRes.json();
-                setRecurringExpenses(recData || []);
-            }
-        } catch (e) {
-            console.error("Failed to fetch data", e);
-        }
-        setIsLoading(false);
-    };
-
-    // Calculate Total Savings (Accumulated from past months)
-    // Only counts closed past months (before current month)
-    const calculateSavings = () => {
-        if (expenses.length === 0) return 0;
-
-        let totalSavings = 0;
-        const currentMonthKey = new Date().toISOString().slice(0, 7); // YYYY-MM
-
-        // Group expenses by month
-        const expensesByMonth = {};
-        expenses.forEach(e => {
-            const monthKey = e.date.slice(0, 7);
-            if (monthKey < currentMonthKey) { // Only count past months
-                expensesByMonth[monthKey] = (expensesByMonth[monthKey] || 0) + Number(e.amount);
-            }
-        });
-
-        // Determine date range to iterate (from first expense or arbitrary start)
-        const dates = expenses.map(e => new Date(e.date));
-        if (dates.length === 0) return 0;
-
-        const minDate = new Date(Math.min(...dates));
-        const maxDate = new Date(); // Start of current month
-        maxDate.setDate(1);
-        maxDate.setHours(0, 0, 0, 0);
-
-        let iterDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-
-        while (iterDate < maxDate) {
-            const monthKey = iterDate.toISOString().slice(0, 7);
-            const spent = expensesByMonth[monthKey] || 0;
-
-            // Determine budget for this specific month
-            const monthlyEntry = monthlyBudgets.find(mb => mb.month === monthKey);
-            // Default to 2000 is a safe fallback if no default budget is loaded yet, but usually we fallback to current admin budget
-            const monthBudget = monthlyEntry ? Number(monthlyEntry.amount) : (budgets['Admin'] || 2000);
-
-            totalSavings += (monthBudget - spent);
-
-            iterDate.setMonth(iterDate.getMonth() + 1);
-        }
-
-        return totalSavings;
-    };
-
-    const savings = calculateSavings();
-
-    const addExpense = async (expenseData) => {
-        try {
-            const res = await fetch(`${API_URL}/expenses`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify(expenseData),
-            });
-            if (res.ok) {
-                const newExpense = await res.json();
-                setExpenses(prev => [newExpense, ...prev]); // Optimistic update (prepend to top)
-                setTimeout(() => fetchData(), 500); // 500ms delay to ensure DB consistency
-                return true;
-            }
-            return false;
-        } catch (e) {
-            console.error("Failed to add expense", e);
-            return false;
-        }
-    };
-
-    const addRecurringExpense = async (expenseData) => {
-        try {
-            const res = await fetch(`${API_URL}/recurring`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(expenseData)
-            });
-            if (res.ok) {
-                const newRec = await res.json();
-                setRecurringExpenses(prev => [...prev, newRec]);
-            }
-        } catch (e) {
-            console.error("Failed to add recurring expense", e);
-        }
-    };
-
-    const deleteRecurringExpense = async (id) => {
-        try {
-            await fetch(`${API_URL}/recurring/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            setRecurringExpenses(prev => prev.filter(r => r.id !== id));
-        } catch (e) {
-            console.error("Failed to delete recurring expense", e);
-        }
-    };
-
-    const deleteExpense = async (id) => {
-        try {
-            await fetch(`${API_URL}/expenses/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            setExpenses(prev => prev.filter(exp => exp.id !== id));
-        } catch (e) {
-            console.error("Failed to delete expense", e);
-        }
-    };
-
-    const updateExpense = async (id, expenseData) => {
-        try {
-            const res = await fetch(`${API_URL}/expenses/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify(expenseData),
-            });
-            if (res.ok) {
-                // Refetch all data to ensure UI is in sync with database
-                fetchData();
-            }
-        } catch (e) {
-            console.error("Failed to update expense", e);
-        }
-    };
+    // ...
 
     const updateBudget = async (newBudget, month = null) => {
-        const targetUser = selectedUser || 'admin';
-        const targetUsername = selectedUser || 'Admin';
+        // Use selectedUser (if admin filtering) OR current authenticated user
+        const targetUser = selectedUser || user?.id || 'admin';
+        const targetUsername = selectedUser || user?.username || 'Admin';
 
         try {
+            // Optimistic Update / Local State Update BEFORE or AFTER fetch
+            // Check if month specific
+            if (month) {
+                setMonthlyBudgets(prev => {
+                    const filtered = prev.filter(m => m.month !== month);
+                    return [...filtered, { userId: targetUser, month, amount: newBudget }];
+                });
+            } else {
+                // Update global/default budget map
+                setBudgets(prev => ({ ...prev, [targetUsername]: newBudget }));
+
+                // If we are the target user (or default view), update defaultBudget state too for immediate UI reflection
+                if (!selectedUser || selectedUser === targetUsername) {
+                    setDefaultBudget(newBudget);
+                }
+            }
+
             await fetch(`${API_URL}/budget`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -209,21 +42,10 @@ export function ExpenseProvider({ children }) {
                     userId: targetUser,
                     username: targetUsername,
                     amount: newBudget,
-                    month: month // Optional specific month
+                    month: month
                 })
             });
 
-            if (month) {
-                // Update local monthly budgets state
-                setMonthlyBudgets(prev => {
-                    const filtered = prev.filter(m => m.month !== month);
-                    return [...filtered, { userId: targetUser, month, amount: newBudget }];
-                });
-            } else {
-                // Update global/default budget
-                setBudgets(prev => ({ ...prev, [targetUsername]: newBudget }));
-                setDefaultBudget(newBudget);
-            }
         } catch (e) {
             console.error("Failed to update budget", e);
         }

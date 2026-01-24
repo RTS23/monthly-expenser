@@ -67,9 +67,9 @@ const AppTour = () => {
             disableBeacon: true,
         },
         {
-            target: '[data-tour="add-expense-btn"]',
+            target: '[data-tour="add-expense-trigger"]',
             content: t('tour.desktop.add'),
-            placement: 'left',
+            placement: 'bottom',
         },
         {
             target: '[data-tour="dashboard-stats"]',

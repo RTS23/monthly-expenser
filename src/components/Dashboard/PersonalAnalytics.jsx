@@ -81,6 +81,7 @@ const PersonalAnalytics = () => {
 
                 <button
                     onClick={() => setIsAddExpenseOpen(true)}
+                    data-tour="add-expense-trigger"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/30 transition-all hover:scale-105 active:scale-95"
                 >
                     <span className="text-lg">+</span>
