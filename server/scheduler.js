@@ -8,6 +8,41 @@ export const startScheduler = () => {
         console.log('Running recurring expense scheduler...');
 
         const today = new Date();
+        const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        const daysRemaining = daysInMonth - today.getDate();
+
+        // 1. Budget Reset Reminder (3 Days before)
+        if (daysRemaining === 3) {
+            console.log('Sending Monthly Reset Reminder...');
+            const budgets = await getAllBudgets();
+            for (const b of budgets) {
+                if (b.userId) {
+                    await sendDM(b.userId, `📅 **Budget Reset Incoming!**\nYour monthly budget will reset in **3 days**. Make sure to review your spending!`);
+                }
+            }
+        }
+
+        // 2. Upcoming Recurring Expenses (Due Tomorrow)
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        const tomorrowDay = tomorrow.getDate();
+
+        const recurring = await getRecurringExpenses();
+        // Group by User
+        const userRecurring = {};
+        for (const rec of recurring) {
+            if (rec.dayOfMonth === tomorrowDay && rec.userId) {
+                if (!userRecurring[rec.userId]) userRecurring[rec.userId] = [];
+                userRecurring[rec.userId].push(rec);
+            }
+        }
+
+        for (const [userId, items] of Object.entries(userRecurring)) {
+            const total = items.reduce((sum, i) => sum + i.amount, 0);
+            const list = items.map(i => `• ${i.title} (${i.amount})`).join('\n');
+            await sendDM(userId, `🔔 **Upcoming Bills Tomorrow**\nYou have ${items.length} recurring expenses due tomorrow:\n${list}\n\nTotal: **${total}**`);
+        }
+
         if (today.getDate() === 1) {
             console.log('📅 First day of the month! Performing monthly maintenance...');
         }

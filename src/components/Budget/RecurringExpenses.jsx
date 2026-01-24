@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../../contexts/ExpenseContext';
 import { useSettings } from '../../contexts/SettingsContext';
-import { Trash2, Repeat, Plus, Coffee, ShoppingBag, Home, Car, Zap, Smartphone, MoreHorizontal, X } from 'lucide-react';
+import { Trash2, Repeat, Plus, Coffee, ShoppingBag, Home, Car, Zap, Smartphone, MoreHorizontal, X, Calendar as CalendarIcon, List as ListIcon } from 'lucide-react';
 import ConfirmModal from '../UI/ConfirmModal';
+import BudgetCalendar from './BudgetCalendar';
 
 const CategoryIcon = ({ category }) => {
     const icons = {
@@ -40,6 +41,7 @@ const RecurringExpenses = () => {
     const isDark = theme === 'dark';
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
     const [formData, setFormData] = useState({
         title: '',
@@ -80,62 +82,91 @@ const RecurringExpenses = () => {
     return (
         <div className="space-y-4 sm:space-y-6 pb-20">
             {/* Header */}
-            <div>
-                <h2 className="text-lg sm:text-2xl font-bold text-main flex items-center gap-2">
-                    <Repeat className="text-indigo-500" size={20} />
-                    {language === 'id' ? 'Pengeluaran Rutin' : 'Recurring Expenses'}
-                </h2>
-                <p className="text-muted text-sm">
-                    {language === 'id'
-                        ? 'Kelola pengeluaran yang otomatis dicatat setiap bulan'
-                        : 'Manage expenses that are automatically logged every month'}
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-lg sm:text-2xl font-bold text-main flex items-center gap-2">
+                        <Repeat className="text-indigo-500" size={20} />
+                        {language === 'id' ? 'Pengeluaran Rutin' : 'Recurring Expenses'}
+                    </h2>
+                    <p className="text-muted text-sm">
+                        {language === 'id'
+                            ? 'Kelola pengeluaran yang otomatis dicatat setiap bulan'
+                            : 'Manage expenses that are automatically logged every month'}
+                    </p>
+                </div>
+
+                {/* View Toggle */}
+                <div className={`flex p-1 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-slate-100 border-slate-200'}`}>
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`p-2 rounded-lg transition-all ${viewMode === 'list'
+                            ? (isDark ? 'bg-slate-800 text-indigo-400 shadow-sm' : 'bg-white text-indigo-600 shadow-sm')
+                            : 'text-muted hover:text-main'}`}
+                    >
+                        <ListIcon size={18} />
+                    </button>
+                    <button
+                        onClick={() => setViewMode('calendar')}
+                        className={`p-2 rounded-lg transition-all ${viewMode === 'calendar'
+                            ? (isDark ? 'bg-slate-800 text-indigo-400 shadow-sm' : 'bg-white text-indigo-600 shadow-sm')
+                            : 'text-muted hover:text-main'}`}
+                    >
+                        <CalendarIcon size={18} />
+                    </button>
+                </div>
             </div>
 
-            {/* Recurring Items Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {recurringExpenses.map(rec => (
-                    <div
-                        key={rec.id}
-                        className={`p-3 sm:p-4 rounded-2xl border transition-all hover:shadow-lg group relative
+            {/* Content Switch */}
+            {viewMode === 'calendar' ? (
+                <div className="animate-in fade-in duration-300">
+                    <BudgetCalendar recurringExpenses={recurringExpenses} />
+                </div>
+            ) : (
+                /* Recurring Items Grid */
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 animate-in fade-in duration-300">
+                    {recurringExpenses.map(rec => (
+                        <div
+                            key={rec.id}
+                            className={`p-3 sm:p-4 rounded-2xl border transition-all hover:shadow-lg group relative
                             ${isDark ? 'bg-slate-800/50 border-slate-700/50' : 'bg-white border-slate-200'}
                         `}
-                    >
-                        <div className="flex justify-between items-start mb-2 sm:mb-3">
-                            <CategoryIcon category={rec.category} />
-                            <div className="text-right">
-                                <p className="font-bold text-base sm:text-lg text-main">{formatCurrency(rec.amount)}</p>
-                                <p className="text-[10px] sm:text-xs text-muted">/{language === 'id' ? 'bulan' : 'month'}</p>
-                            </div>
-                        </div>
-
-                        <h3 className="font-semibold text-sm sm:text-base text-main mb-1 truncate">{rec.title}</h3>
-
-                        <div className="flex items-center gap-2 text-xs text-muted">
-                            <Repeat size={12} />
-                            <span>
-                                {language === 'id'
-                                    ? `Tanggal ${rec.dayOfMonth}`
-                                    : `Day ${rec.dayOfMonth}`}
-                            </span>
-                        </div>
-
-                        <button
-                            onClick={() => setDeleteModal({ isOpen: true, id: rec.id })}
-                            className="absolute top-3 right-3 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                         >
-                            <Trash2 size={14} />
-                        </button>
-                    </div>
-                ))}
+                            <div className="flex justify-between items-start mb-2 sm:mb-3">
+                                <CategoryIcon category={rec.category} />
+                                <div className="text-right">
+                                    <p className="font-bold text-base sm:text-lg text-main">{formatCurrency(rec.amount)}</p>
+                                    <p className="text-[10px] sm:text-xs text-muted">/{language === 'id' ? 'bulan' : 'month'}</p>
+                                </div>
+                            </div>
 
-                {recurringExpenses.length === 0 && (
-                    <div className="col-span-full py-12 text-center text-muted">
-                        <Repeat size={48} className="mx-auto mb-4 opacity-20" />
-                        <p>{language === 'id' ? 'Belum ada pengeluaran rutin' : 'No recurring expenses yet'}</p>
-                    </div>
-                )}
-            </div>
+                            <h3 className="font-semibold text-sm sm:text-base text-main mb-1 truncate">{rec.title}</h3>
+
+                            <div className="flex items-center gap-2 text-xs text-muted">
+                                <Repeat size={12} />
+                                <span>
+                                    {language === 'id'
+                                        ? `Tanggal ${rec.dayOfMonth}`
+                                        : `Day ${rec.dayOfMonth}`}
+                                </span>
+                            </div>
+
+                            <button
+                                onClick={() => setDeleteModal({ isOpen: true, id: rec.id })}
+                                className="absolute top-3 right-3 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                            >
+                                <Trash2 size={14} />
+                            </button>
+                        </div>
+                    ))}
+
+                    {recurringExpenses.length === 0 && (
+                        <div className="col-span-full py-12 text-center text-muted">
+                            <Repeat size={48} className="mx-auto mb-4 opacity-20" />
+                            <p>{language === 'id' ? 'Belum ada pengeluaran rutin' : 'No recurring expenses yet'}</p>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Floating Add Button - Fixed at bottom */}
             <button
