@@ -116,7 +116,7 @@ export const addExpense = async (expense) => {
     const result = await execute('SELECT * FROM budgets WHERE userId = ?', [expense.userId]);
     const userBudget = result.rows[0];
     if (!userBudget) {
-      await execute('INSERT INTO budgets (userId, username, amount) VALUES (?, ?, ?)', [expense.userId, expense.username, 2000]);
+      await execute('INSERT INTO budgets (userId, username, amount) VALUES (?, ?, ?)', [expense.userId, expense.username, 0]);
     }
   }
   return { ...expense, id };
@@ -155,7 +155,7 @@ export const getAllBudgets = async () => {
 
 export const getUserBudget = async (userId) => {
   const result = await execute("SELECT amount FROM budgets WHERE userId = ?", [userId]);
-  return result.rows[0] ? Number(result.rows[0].amount) : 2000; // Default 2000
+  return result.rows[0] ? Number(result.rows[0].amount) : 0; // Default 0
 };
 
 

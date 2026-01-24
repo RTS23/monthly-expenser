@@ -120,12 +120,27 @@ const AddExpenseForm = () => {
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-medium">{currencySymbol}</span>
                                     <input
-                                        type="number"
-                                        step={currency === 'IDR' ? '1000' : '0.01'}
-                                        placeholder={currency === 'IDR' ? '50000' : '10.00'}
-                                        className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-main placeholder-muted focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-                                        value={formData.amount}
-                                        onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder={currency === 'IDR' ? '50.000' : '10.00'}
+                                        className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-main placeholder-muted focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono"
+                                        value={(() => {
+                                            if (!formData.amount) return '';
+                                            if (currency === 'IDR') {
+                                                return Number(formData.amount).toLocaleString('id-ID');
+                                            }
+                                            return formData.amount;
+                                        })()}
+                                        onChange={(e) => {
+                                            let val = e.target.value;
+                                            if (currency === 'IDR') {
+                                                // Remove existing dots to get raw number
+                                                val = val.replace(/\./g, '');
+                                                // Allow only numbers
+                                                if (!/^\d*$/.test(val)) return;
+                                            }
+                                            setFormData({ ...formData, amount: val });
+                                        }}
                                     />
                                 </div>
                                 {formData.amount && (
