@@ -5,66 +5,72 @@ import { Save, Wallet, RefreshCw, Loader2 } from 'lucide-react';
 import BudgetHistory from './BudgetHistory';
 
 const BudgetSettings = () => {
-    const { budget, updateBudget, budgets, selectedUser } = useExpenses();
+    const { budget, updateBudget, budgets, selectedUser, monthlyBudgets } = useExpenses();
     const { t, formatCurrency, currency, fromBaseCurrency, toBaseCurrency, exchangeRate, rateLoading, lastUpdated } = useSettings();
 
     const [isEditing, setIsEditing] = useState(false);
-    const [localBudget, setLocalBudget] = useState(0);
+    const [localBudget, setLocalBudget] = useState('');
     const [saved, setSaved] = useState(false);
     const [mode, setMode] = useState('set'); // 'set' or 'add'
+    const [isMonthly, setIsMonthly] = useState(false); // Toggle for monthly override
 
     // Determine which budget we are actually editing
     const targetUsername = selectedUser || 'Admin';
-    const editableBudget = (budgets && budgets[targetUsername]) || 2000;
+    const currentIsoMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
 
-    // Sync local budget only when not editing
-    useEffect(() => {
-        if (!isEditing) {
-            setLocalBudget(fromBaseCurrency(editableBudget));
-        }
-    }, [editableBudget, isEditing, fromBaseCurrency]);
+    // Default Budget = budgets[user] || 2000
+    const defaultUserBudget = (budgets && budgets[targetUsername]) || 2000;
+
+    // Monthly Budget check
+    // monthlyBudgets contains { userId, month, amount }
+    // We need to match userId carefully. Backend might store 'admin' or 'Admin'.
+    // We should normalize or check both? Context usually handles case-sensitivity now.
+    // Let's assume fetching matches the user ID logic.
+    const monthlyEntry = monthlyBudgets ? monthlyBudgets.find(mb => mb.month === currentIsoMonth && mb.userId === (selectedUser || 'admin')) : null;
+    const monthlyUserBudget = monthlyEntry ? Number(monthlyEntry.amount) : defaultUserBudget;
+
+    const editableBudget = isMonthly ? monthlyUserBudget : defaultUserBudget;
+
+
 
     const handleOpenModal = () => {
         setIsEditing(true);
-        setMode('set'); // Always start in Set mode
-        setLocalBudget(fromBaseCurrency(editableBudget)); // Always load personal budget
-        console.log(`Opened Budget Modal for ${targetUsername}: Mode set to SET, Budget loaded:`, editableBudget);
+        setMode('set');
+        setIsMonthly(false);
+        setLocalBudget(''); // Start empty as requested
+        console.log(`Opened Budget Modal for ${targetUsername}`);
+    };
+
+    const handleToggleMonthly = (checked) => {
+        setIsMonthly(checked);
+        setLocalBudget(''); // Clear input when switching context
+        setMode('set');
     };
 
     const handleSwitchToSet = () => {
         setMode('set');
-        setLocalBudget(fromBaseCurrency(editableBudget));
-        console.log('Switched to SET Mode');
+        setLocalBudget(''); // Clear input
     };
 
     const handleSwitchToAdd = () => {
         setMode('add');
         setLocalBudget('');
-        console.log('Switched to ADD Mode');
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         let finalBaseAmount;
 
-        console.log('Budget Update - Mode:', mode);
-        console.log('Raw Input:', localBudget);
-        console.log('Current Personal Budget:', editableBudget);
-
         if (mode === 'add') {
-            // Calculate new total: Personal Budget (Base) + Input Amount (Converted to Base)
             const additionalAmountBase = toBaseCurrency(Number(localBudget));
             finalBaseAmount = editableBudget + additionalAmountBase;
-            console.log('Add Mode - Additional (Base):', additionalAmountBase);
         } else {
-            // Set new total directly
             finalBaseAmount = toBaseCurrency(Number(localBudget));
-            console.log('Set Mode - New Total (Base):', finalBaseAmount);
         }
 
-        console.log('Final Amount to Save:', finalBaseAmount);
+        // Pass month if isMonthly is true
+        updateBudget(finalBaseAmount, isMonthly ? currentIsoMonth : null);
 
-        updateBudget(finalBaseAmount);
         setSaved(true);
         setTimeout(() => {
             setSaved(false);
@@ -133,6 +139,26 @@ const BudgetSettings = () => {
                 {/* Edit/Add Mode */}
                 {isEditing && (
                     <form onSubmit={handleSubmit} className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
+
+                        {/* Monthly vs Default Toggle */}
+                        <div className="bg-slate-800/10 dark:bg-slate-800/50 p-3 rounded-xl flex items-center justify-between border border-slate-700/20">
+                            <div className="flex flex-col">
+                                <span className="text-sm font-medium text-main">
+                                    {isMonthly ? `Budget for ${new Date().toLocaleString('default', { month: 'long' })}` : "Default Monthly Budget"}
+                                </span>
+                                <span className="text-xs text-muted">
+                                    {isMonthly ? "Only affects this month" : "Applies to all new months"}
+                                </span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => handleToggleMonthly(!isMonthly)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isMonthly ? 'bg-indigo-600' : 'bg-slate-400 dark:bg-slate-600'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isMonthly ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+
                         {/* Mode Toggle */}
                         <div className="flex bg-slate-800/50 p-1 rounded-xl">
                             <button
@@ -160,12 +186,11 @@ const BudgetSettings = () => {
                                 <input
                                     type="text"
                                     inputMode="numeric"
-                                    value={currency === 'IDR'
+                                    value={localBudget === '' ? '' : (currency === 'IDR'
                                         ? Math.round(Number(localBudget)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                                        : localBudget
+                                        : localBudget)
                                     }
                                     onChange={(e) => {
-                                        // Remove non-digit characters to get raw number
                                         const rawValue = currency === 'IDR'
                                             ? e.target.value.replace(/\./g, '')
                                             : e.target.value.replace(/,/g, '');
@@ -202,15 +227,22 @@ const BudgetSettings = () => {
                             )}
 
                             {mode === 'set' && (
-                                <p className="text-xs text-muted mt-2">
-                                    {currency === 'IDR'
-                                        ? `≈ $${toBaseCurrency(Number(localBudget)).toFixed(2)} USD`
-                                        : `≈ Rp ${(Number(localBudget) * exchangeRate).toLocaleString('id-ID', { maximumFractionDigits: 0 })} IDR`
-                                    }
-                                </p>
+                                <div className="mt-3">
+                                    <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                                        <div className="flex justify-between text-sm text-muted">
+                                            <span>Current:</span>
+                                            <span className="font-medium text-main">{formatCurrency(editableBudget)}</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-muted mt-2">
+                                        {currency === 'IDR'
+                                            ? `≈ $${toBaseCurrency(Number(localBudget)).toFixed(2)} USD`
+                                            : `≈ Rp ${(Number(localBudget) * exchangeRate).toLocaleString('id-ID', { maximumFractionDigits: 0 })} IDR`
+                                        }
+                                    </p>
+                                </div>
                             )}
                         </div>
-
                         <div className="flex gap-3">
                             <button
                                 type="button"
@@ -235,7 +267,7 @@ const BudgetSettings = () => {
             <div className="max-w-xl mx-auto">
                 <BudgetHistory />
             </div>
-        </div>
+        </div >
     );
 };
 

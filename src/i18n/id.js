@@ -68,7 +68,7 @@ export const id = {
         noBudget: 'Belum ada anggaran',
         cancel: 'Batal',
         save: 'Simpan',
-        setMode: 'Atur Ulang',
+        setMode: 'Atur Anggaran',
         addMode: 'Tambah Dana',
         current: 'Saat Ini',
         add: 'Tambah',

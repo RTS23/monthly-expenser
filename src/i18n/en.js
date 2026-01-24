@@ -68,7 +68,7 @@ export const en = {
         noBudget: 'No budget set',
         cancel: 'Cancel',
         save: 'Save',
-        setMode: 'Set New',
+        setMode: 'Set Budget',
         addMode: 'Add Funds',
         current: 'Current',
         add: 'Add',

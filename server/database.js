@@ -158,6 +158,7 @@ export const getUserBudget = async (userId) => {
   return result.rows[0] ? Number(result.rows[0].amount) : 2000; // Default 2000
 };
 
+
 export const updateUserBudget = async (userId, username, amount) => {
   const result = await execute('SELECT 1 FROM budgets WHERE userId = ?', [userId]);
   const exists = result.rows.length > 0;
@@ -166,6 +167,22 @@ export const updateUserBudget = async (userId, username, amount) => {
     return await execute("UPDATE budgets SET amount = ?, username = ? WHERE userId = ?", [amount, username, userId]);
   } else {
     return await execute("INSERT INTO budgets (userId, username, amount) VALUES (?, ?, ?)", [userId, username, amount]);
+  }
+};
+
+export const getUserMonthlyBudgets = async (userId) => {
+  const result = await execute('SELECT * FROM monthly_budgets WHERE userId = ?', [userId]);
+  return result.rows;
+};
+
+export const updateUserMonthlyBudget = async (userId, month, amount) => {
+  const result = await execute('SELECT 1 FROM monthly_budgets WHERE userId = ? AND month = ?', [userId, month]);
+  const exists = result.rows.length > 0;
+
+  if (exists) {
+    return await execute("UPDATE monthly_budgets SET amount = ? WHERE userId = ? AND month = ?", [amount, userId, month]);
+  } else {
+    return await execute("INSERT INTO monthly_budgets (userId, month, amount) VALUES (?, ?, ?)", [userId, month, amount]);
   }
 };
 

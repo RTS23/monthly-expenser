@@ -2,6 +2,7 @@ import React from 'react';
 import { useExpenses } from '../../contexts/ExpenseContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import SavingsCard from './SavingsCard';
 
 const Overview = () => {
     const { expenses, budget } = useExpenses();
@@ -24,7 +25,7 @@ const Overview = () => {
     };
 
     return (
-        <div data-tour="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-8 perspective-1000">
+        <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8 perspective-1000">
             {/* Total Budget Card */}
             <div className="glass-panel tilt-3d p-4 sm:p-6 rounded-2xl relative overflow-hidden group stagger-1">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -78,6 +79,10 @@ const Overview = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+            {/* Savings Card */}
+            <div className="stagger-4">
+                <SavingsCard />
             </div>
         </div>
     );

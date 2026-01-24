@@ -23,6 +23,7 @@ export function ExpenseProvider({ children }) {
     const [amountRange, setAmountRange] = useState({ min: null, max: null }); // Amount range filter
 
     const [recurringExpenses, setRecurringExpenses] = useState([]);
+    const [monthlyBudgets, setMonthlyBudgets] = useState([]);
 
     // Load from API on mount
     useEffect(() => {
@@ -33,15 +34,21 @@ export function ExpenseProvider({ children }) {
         try {
             const res = await fetch(`${API_URL}/expenses`, { credentials: 'include' });
             const data = await res.json();
-            setExpenses(data.expenses || []);
+            const { expenses: fetchedExpenses, budgets: fetchedBudgets, monthlyBudgets: fetchedMonthly } = data;
+
+            setExpenses(fetchedExpenses || []);
 
             const budgetMap = {};
-            if (data.budgets) {
-                data.budgets.forEach(b => {
+            if (fetchedBudgets) {
+                fetchedBudgets.forEach(b => {
                     budgetMap[b.username] = b.amount;
                 });
             }
             setBudgets(budgetMap);
+
+            if (Array.isArray(fetchedMonthly)) {
+                setMonthlyBudgets(fetchedMonthly);
+            }
 
             // Fetch recurring expenses
             const recRes = await fetch(`${API_URL}/recurring`, { credentials: 'include' });
@@ -54,6 +61,53 @@ export function ExpenseProvider({ children }) {
         }
         setIsLoading(false);
     };
+
+    // Calculate Total Savings (Accumulated from past months)
+    // Only counts closed past months (before current month)
+    const calculateSavings = () => {
+        if (expenses.length === 0) return 0;
+
+        let totalSavings = 0;
+        const currentMonthKey = new Date().toISOString().slice(0, 7); // YYYY-MM
+
+        // Group expenses by month
+        const expensesByMonth = {};
+        expenses.forEach(e => {
+            const monthKey = e.date.slice(0, 7);
+            if (monthKey < currentMonthKey) { // Only count past months
+                expensesByMonth[monthKey] = (expensesByMonth[monthKey] || 0) + Number(e.amount);
+            }
+        });
+
+        // Determine date range to iterate (from first expense or arbitrary start)
+        const dates = expenses.map(e => new Date(e.date));
+        if (dates.length === 0) return 0;
+
+        const minDate = new Date(Math.min(...dates));
+        const maxDate = new Date(); // Start of current month
+        maxDate.setDate(1);
+        maxDate.setHours(0, 0, 0, 0);
+
+        let iterDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+
+        while (iterDate < maxDate) {
+            const monthKey = iterDate.toISOString().slice(0, 7);
+            const spent = expensesByMonth[monthKey] || 0;
+
+            // Determine budget for this specific month
+            const monthlyEntry = monthlyBudgets.find(mb => mb.month === monthKey);
+            // Default to 2000 is a safe fallback if no default budget is loaded yet, but usually we fallback to current admin budget
+            const monthBudget = monthlyEntry ? Number(monthlyEntry.amount) : (budgets['Admin'] || 2000);
+
+            totalSavings += (monthBudget - spent);
+
+            iterDate.setMonth(iterDate.getMonth() + 1);
+        }
+
+        return totalSavings;
+    };
+
+    const savings = calculateSavings();
 
     const addExpense = async (expenseData) => {
         try {
@@ -133,7 +187,7 @@ export function ExpenseProvider({ children }) {
         }
     };
 
-    const updateBudget = async (newBudget) => {
+    const updateBudget = async (newBudget, month = null) => {
         const targetUser = selectedUser || 'admin';
         const targetUsername = selectedUser || 'Admin';
 
@@ -145,12 +199,22 @@ export function ExpenseProvider({ children }) {
                 body: JSON.stringify({
                     userId: targetUser,
                     username: targetUsername,
-                    amount: newBudget
+                    amount: newBudget,
+                    month: month // Optional specific month
                 })
             });
 
-            setBudgets(prev => ({ ...prev, [targetUsername]: newBudget }));
-            setDefaultBudget(newBudget);
+            if (month) {
+                // Update local monthly budgets state
+                setMonthlyBudgets(prev => {
+                    const filtered = prev.filter(m => m.month !== month);
+                    return [...filtered, { userId: targetUser, month, amount: newBudget }];
+                });
+            } else {
+                // Update global/default budget
+                setBudgets(prev => ({ ...prev, [targetUsername]: newBudget }));
+                setDefaultBudget(newBudget);
+            }
         } catch (e) {
             console.error("Failed to update budget", e);
         }
@@ -288,7 +352,9 @@ export function ExpenseProvider({ children }) {
         addRecurringExpense,
         deleteRecurringExpense,
         exportToCSV,
-        budgets
+        budgets,
+        monthlyBudgets,
+        savings
     };
 
     return (

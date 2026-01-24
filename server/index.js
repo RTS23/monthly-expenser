@@ -111,11 +111,16 @@ app.get('/api/expenses', isAuthenticated, async (req, res) => {
         const budgets = await getAllBudgets();
 
         if (req.user.isAdmin) {
+            // Admin logic (maybe fetch all monthly budgets for admin?)
+            // For now, keep simple
             res.json({ expenses, budgets });
         } else {
             const userExpenses = expenses.filter(e => e.userId === req.user.id);
             const userBudget = budgets.filter(b => b.userId === req.user.id);
-            res.json({ expenses: userExpenses, budgets: userBudget });
+            // Fetch monthly budgets for this user
+            const monthlyBudgets = await getUserMonthlyBudgets(req.user.id);
+
+            res.json({ expenses: userExpenses, budgets: userBudget, monthlyBudgets });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -181,15 +186,20 @@ app.put('/api/expenses/:id', isAuthenticated, async (req, res) => {
 
 app.post('/api/budget', isAuthenticated, async (req, res) => {
     try {
-        let { userId, username, amount } = req.body;
+        let { userId, username, amount, month } = req.body;
 
         if (!req.user.isAdmin) {
             userId = req.user.id;
             username = req.user.username;
         }
 
-        await updateUserBudget(userId || 'admin', username || 'Admin', amount);
-        res.status(200).json({ success: true, budget: amount });
+        if (month) {
+            await updateUserMonthlyBudget(userId || 'admin', month, amount);
+        } else {
+            await updateUserBudget(userId || 'admin', username || 'Admin', amount);
+        }
+
+        res.status(200).json({ success: true, budget: amount, month });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
