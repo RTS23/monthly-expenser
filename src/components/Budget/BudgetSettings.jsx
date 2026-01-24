@@ -11,18 +11,31 @@ const BudgetSettings = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [localBudget, setLocalBudget] = useState(() => fromBaseCurrency(budget));
     const [saved, setSaved] = useState(false);
+    const [mode, setMode] = useState('set'); // 'set' or 'add'
 
     // Sync local budget only when not editing, or on initial load
     useEffect(() => {
         if (!isEditing) {
             setLocalBudget(fromBaseCurrency(budget));
+            setMode('set'); // Reset mode when closed
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }
-    }, [budget, currency, exchangeRate, isEditing]);
+    }, [budget, currency, exchangeRate, isEditing, fromBaseCurrency]); // Added dependency
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const baseAmount = toBaseCurrency(Number(localBudget));
-        updateBudget(baseAmount);
+        let finalBaseAmount;
+
+        if (mode === 'add') {
+            // Calculate new total: Current Budget (Base) + Input Amount (Converted to Base)
+            const additionalAmountBase = toBaseCurrency(Number(localBudget));
+            finalBaseAmount = budget + additionalAmountBase;
+        } else {
+            // Set new total directly
+            finalBaseAmount = toBaseCurrency(Number(localBudget));
+        }
+
+        updateBudget(finalBaseAmount);
         setSaved(true);
         setTimeout(() => {
             setSaved(false);
@@ -91,9 +104,36 @@ const BudgetSettings = () => {
                 {/* Edit/Add Mode */}
                 {isEditing && (
                     <form onSubmit={handleSubmit} className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
+                        {/* Mode Toggle */}
+                        <div className="flex bg-slate-800/50 p-1 rounded-xl">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setMode('set');
+                                    setLocalBudget(fromBaseCurrency(budget));
+                                }}
+                                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === 'set' ? 'bg-indigo-600 text-white shadow-lg' : 'text-muted hover:text-white'}`}
+                            >
+                                {t('budget.setMode') || (language === 'id' ? 'Atur Ulang' : 'Set New')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setMode('add');
+                                    setLocalBudget('');
+                                }}
+                                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === 'add' ? 'bg-indigo-600 text-white shadow-lg' : 'text-muted hover:text-white'}`}
+                            >
+                                {t('budget.addMode') || (language === 'id' ? 'Tambah Dana' : 'Add Funds')}
+                            </button>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-main mb-2">
-                                {hasBudget ? t('budget.editTitle') : t('budget.addTitle')}
+                                {mode === 'set'
+                                    ? (t('budget.editTitle') || (language === 'id' ? 'Total Anggaran' : 'Total Budget'))
+                                    : (language === 'id' ? 'Jumlah Tambahan' : 'Additional Amount')
+                                }
                             </label>
                             <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-semibold">{currencySymbol}</span>
@@ -101,12 +141,15 @@ const BudgetSettings = () => {
                                     type="text"
                                     inputMode="numeric"
                                     value={currency === 'IDR'
-                                        ? Math.round(localBudget).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                                        ? Math.round(Number(localBudget)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                                         : localBudget
                                     }
                                     onChange={(e) => {
                                         // Remove non-digit characters to get raw number
-                                        const rawValue = e.target.value.replace(/\./g, '');
+                                        const rawValue = currency === 'IDR'
+                                            ? e.target.value.replace(/\./g, '')
+                                            : e.target.value.replace(/,/g, '');
+
                                         if (!isNaN(rawValue)) {
                                             setLocalBudget(rawValue);
                                         }
@@ -116,14 +159,34 @@ const BudgetSettings = () => {
                                     placeholder="0"
                                 />
                             </div>
-                            {currency === 'IDR' && (
-                                <p className="text-xs text-muted mt-2">
-                                    ≈ ${toBaseCurrency(localBudget).toFixed(2)} USD
-                                </p>
+
+                            {/* Preview Calculation for Add Mode */}
+                            {mode === 'add' && localBudget > 0 && (
+                                <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted">{language === 'id' ? 'Saat Ini:' : 'Current:'}</span>
+                                        <span className="text-main">{formatCurrency(budget)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm mt-1">
+                                        <span className="text-emerald-400">+ {language === 'id' ? 'Tambah:' : 'Add:'}</span>
+                                        <span className="text-emerald-400">{formatCurrency(toBaseCurrency(localBudget), true)}</span>
+                                    </div>
+                                    <div className="border-t border-indigo-500/20 my-2"></div>
+                                    <div className="flex justify-between font-bold">
+                                        <span className="text-indigo-300">{language === 'id' ? 'Total Baru:' : 'New Total:'}</span>
+                                        <span className="text-indigo-300">
+                                            {formatCurrency(budget + toBaseCurrency(Number(localBudget)), true)}
+                                        </span>
+                                    </div>
+                                </div>
                             )}
-                            {currency === 'USD' && (
+
+                            {mode === 'set' && (
                                 <p className="text-xs text-muted mt-2">
-                                    ≈ Rp {(localBudget * exchangeRate).toLocaleString('id-ID', { maximumFractionDigits: 0 })} IDR
+                                    {currency === 'IDR'
+                                        ? `≈ $${toBaseCurrency(Number(localBudget)).toFixed(2)} USD`
+                                        : `≈ Rp ${(Number(localBudget) * exchangeRate).toLocaleString('id-ID', { maximumFractionDigits: 0 })} IDR`
+                                    }
                                 </p>
                             )}
                         </div>
