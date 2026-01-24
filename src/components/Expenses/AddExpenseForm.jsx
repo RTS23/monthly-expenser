@@ -3,6 +3,7 @@ import { useExpenses } from '../../contexts/ExpenseContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { Plus, X, Coffee, ShoppingBag, Home, Car, Zap, Smartphone, MoreHorizontal, Sparkles } from 'lucide-react';
 import FileUpload from '../Common/FileUpload';
+import { useToast } from '../UI/Toast';
 
 const CATEGORIES = [
     { id: 'Food', icon: Coffee },
@@ -17,6 +18,7 @@ const CATEGORIES = [
 const AddExpenseForm = () => {
     const { addExpense, isAddExpenseOpen, setIsAddExpenseOpen, expenses } = useExpenses();
     const { t, currency, toBaseCurrency, getCurrencySymbol, exchangeRate } = useSettings();
+    const { showToast } = useToast();
     // const [isOpen, setIsOpen] = useState(false); // Removed local state
     const [formData, setFormData] = useState({
         title: '',
@@ -25,26 +27,34 @@ const AddExpenseForm = () => {
         date: new Date().toISOString().split('T')[0],
         receiptUrl: null
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.title || !formData.amount) return;
 
+        setIsSubmitting(true);
         const baseAmount = toBaseCurrency(Number(formData.amount));
 
-        addExpense({
+        const success = await addExpense({
             ...formData,
             amount: baseAmount
         });
 
-        setFormData({
-            title: '',
-            amount: '',
-            category: 'Food',
-            date: new Date().toISOString().split('T')[0],
-            receiptUrl: null
-        });
-        setIsAddExpenseOpen(false);
+        if (success) {
+            showToast('Expense added successfully! 🚀', 'success');
+            setFormData({
+                title: '',
+                amount: '',
+                category: 'Food',
+                date: new Date().toISOString().split('T')[0],
+                receiptUrl: null
+            });
+            setIsAddExpenseOpen(false);
+        } else {
+            showToast('Failed to add expense. Please try again.', 'error');
+        }
+        setIsSubmitting(false);
     };
 
     const currencySymbol = getCurrencySymbol();
@@ -78,7 +88,7 @@ const AddExpenseForm = () => {
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
-                onClick={() => setIsAddExpenseOpen(false)}
+                onClick={() => !isSubmitting && setIsAddExpenseOpen(false)}
             />
 
             {/* Modal with border gradient */}
@@ -91,8 +101,9 @@ const AddExpenseForm = () => {
                             {t('addExpenseForm.title')}
                         </h3>
                         <button
-                            onClick={() => setIsAddExpenseOpen(false)}
-                            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors hover:rotate-90 duration-300"
+                            onClick={() => !isSubmitting && setIsAddExpenseOpen(false)}
+                            disabled={isSubmitting}
+                            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors hover:rotate-90 duration-300 disabled:opacity-50"
                         >
                             <X size={18} />
                         </button>
@@ -111,6 +122,7 @@ const AddExpenseForm = () => {
                                 value={formData.title}
                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
                                 autoFocus
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -144,6 +156,7 @@ const AddExpenseForm = () => {
                                             }
                                             setFormData({ ...formData, amount: val });
                                         }}
+                                        disabled={isSubmitting}
                                     />
                                 </div>
                                 {formData.amount && (
@@ -165,6 +178,7 @@ const AddExpenseForm = () => {
                                     className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                                     value={formData.date}
                                     onChange={e => setFormData({ ...formData, date: e.target.value })}
+                                    disabled={isSubmitting}
                                 />
                             </div>
                         </div>
@@ -183,12 +197,14 @@ const AddExpenseForm = () => {
                                             key={cat.id}
                                             type="button"
                                             onClick={() => setFormData({ ...formData, category: cat.id })}
+                                            disabled={isSubmitting}
                                             className={`
                                                 flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all duration-300
                                                 ${isSelected
                                                     ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110'
                                                     : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200 hover:scale-105'
                                                 }
+                                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}
                                             `}
                                             style={{ animationDelay: `${index * 50}ms` }}
                                         >
@@ -212,10 +228,15 @@ const AddExpenseForm = () => {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 btn-shine"
+                            disabled={isSubmitting}
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 btn-shine disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            <Plus size={20} />
-                            {t('addExpenseForm.addButton')}
+                            {isSubmitting ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
+                            ) : (
+                                <Plus size={20} />
+                            )}
+                            {isSubmitting ? 'Saving...' : t('addExpenseForm.addButton')}
                         </button>
                     </form>
                 </div>

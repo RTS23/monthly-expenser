@@ -123,10 +123,13 @@ export function ExpenseProvider({ children }) {
                 body: JSON.stringify(expenseData),
             });
             if (res.ok) {
-                fetchData(); // Refresh list
+                await fetchData(); // Refresh list and wait for it
+                return true;
             }
+            return false;
         } catch (e) {
             console.error("Failed to add expense", e);
+            return false;
         }
     };
 
