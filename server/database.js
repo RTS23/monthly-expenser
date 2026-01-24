@@ -21,7 +21,60 @@ const execute = async (sql, args = []) => {
   }
 };
 
-// ...
+// Initialize Database
+const initDb = async () => {
+  try {
+    await execute(`
+            CREATE TABLE IF NOT EXISTS expenses (
+                id TEXT PRIMARY KEY,
+                amount REAL NOT NULL,
+                category TEXT NOT NULL,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL,
+                userId TEXT DEFAULT NULL,
+                username TEXT DEFAULT NULL,
+                receiptUrl TEXT DEFAULT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+    await execute(`
+            CREATE TABLE IF NOT EXISTS budgets (
+                userId TEXT PRIMARY KEY,
+                username TEXT,
+                amount REAL NOT NULL,
+                lastAlertLevel TEXT DEFAULT 'NONE', 
+                lastAlertMonth TEXT DEFAULT NULL
+            )
+        `);
+
+    await execute(`
+            CREATE TABLE IF NOT EXISTS recurring_expenses (
+                id TEXT PRIMARY KEY,
+                amount REAL NOT NULL,
+                category TEXT NOT NULL,
+                title TEXT NOT NULL,
+                dayOfMonth INTEGER NOT NULL,
+                userId TEXT DEFAULT NULL,
+                username TEXT DEFAULT NULL,
+                lastGeneratedDate TEXT DEFAULT NULL
+            )
+        `);
+    console.log(`Database initialized using: ${url.startsWith("libsql") ? "Turso (Remote)" : "Local File (Ephemeral)"}`);
+  } catch (e) {
+    console.error("Failed to init database:", e);
+  }
+};
+
+export const getDbMode = () => url.startsWith("libsql") ? "Turso" : "Local File";
+
+// Auto-run init
+initDb();
+
+export const getRecurringExpenses = async () => {
+  const result = await execute('SELECT * FROM recurring_expenses');
+  return result.rows;
+};
 
 export const addRecurringExpense = async (expense) => {
   const id = uuidv4();
@@ -41,7 +94,18 @@ export const addRecurringExpense = async (expense) => {
   return { ...expense, id };
 };
 
-// ...
+export const deleteRecurringExpense = async (id) => {
+  return await execute('DELETE FROM recurring_expenses WHERE id = ?', [id]);
+};
+
+export const updateRecurringExpenseLastGenerated = async (id, date) => {
+  return await execute('UPDATE recurring_expenses SET lastGeneratedDate = ? WHERE id = ?', [date, id]);
+};
+
+export const getExpenses = async () => {
+  const result = await execute('SELECT * FROM expenses ORDER BY date DESC');
+  return result.rows;
+};
 
 export const addExpense = async (expense) => {
   const id = uuidv4();
@@ -72,7 +136,9 @@ export const addExpense = async (expense) => {
   return { ...expense, id };
 };
 
-// ...
+export const deleteExpense = async (id) => {
+  return await execute('DELETE FROM expenses WHERE id = ?', [id]);
+};
 
 export const updateExpense = async (id, expense) => {
   const args = [
