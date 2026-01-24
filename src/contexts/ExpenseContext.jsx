@@ -123,7 +123,9 @@ export function ExpenseProvider({ children }) {
                 body: JSON.stringify(expenseData),
             });
             if (res.ok) {
-                await fetchData(); // Refresh list and wait for it
+                const newExpense = await res.json();
+                setExpenses(prev => [newExpense, ...prev]); // Optimistic update (prepend to top)
+                fetchData(); // Background sync
                 return true;
             }
             return false;
