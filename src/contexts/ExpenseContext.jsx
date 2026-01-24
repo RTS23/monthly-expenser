@@ -1,6 +1,16 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
-// ... (imports)
+const ExpenseContext = createContext();
+
+export function useExpenses() {
+    return useContext(ExpenseContext);
+}
+
+// Use relative URL in production, localhost in development
+const API_URL = import.meta.env.PROD
+    ? '/api'
+    : 'http://localhost:3001/api';
 
 export function ExpenseProvider({ children }) {
     const { user } = useAuth(); // Get authenticated user
