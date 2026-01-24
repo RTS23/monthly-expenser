@@ -264,7 +264,8 @@ export function ExpenseProvider({ children }) {
         recurringExpenses,
         addRecurringExpense,
         deleteRecurringExpense,
-        exportToCSV
+        exportToCSV,
+        budgets
     };
 
     return (

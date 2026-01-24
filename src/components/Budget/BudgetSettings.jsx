@@ -5,32 +5,35 @@ import { Save, Wallet, RefreshCw, Loader2 } from 'lucide-react';
 import BudgetHistory from './BudgetHistory';
 
 const BudgetSettings = () => {
-    const { budget, updateBudget } = useExpenses();
+    const { budget, updateBudget, budgets, selectedUser } = useExpenses();
     const { t, formatCurrency, currency, fromBaseCurrency, toBaseCurrency, exchangeRate, rateLoading, lastUpdated } = useSettings();
 
     const [isEditing, setIsEditing] = useState(false);
-    const [localBudget, setLocalBudget] = useState(() => fromBaseCurrency(budget));
+    const [localBudget, setLocalBudget] = useState(0);
     const [saved, setSaved] = useState(false);
     const [mode, setMode] = useState('set'); // 'set' or 'add'
 
-    // Sync local budget only when not editing, or on initial load
+    // Determine which budget we are actually editing
+    const targetUsername = selectedUser || 'Admin';
+    const editableBudget = (budgets && budgets[targetUsername]) || 2000;
+
     // Sync local budget only when not editing
     useEffect(() => {
         if (!isEditing) {
-            setLocalBudget(fromBaseCurrency(budget));
+            setLocalBudget(fromBaseCurrency(editableBudget));
         }
-    }, [budget, isEditing, fromBaseCurrency]);
+    }, [editableBudget, isEditing, fromBaseCurrency]);
 
     const handleOpenModal = () => {
         setIsEditing(true);
         setMode('set'); // Always start in Set mode
-        setLocalBudget(fromBaseCurrency(budget)); // Always load current budget
-        console.log('Opened Budget Modal: Mode set to SET, Budget loaded.');
+        setLocalBudget(fromBaseCurrency(editableBudget)); // Always load personal budget
+        console.log(`Opened Budget Modal for ${targetUsername}: Mode set to SET, Budget loaded:`, editableBudget);
     };
 
     const handleSwitchToSet = () => {
         setMode('set');
-        setLocalBudget(fromBaseCurrency(budget));
+        setLocalBudget(fromBaseCurrency(editableBudget));
         console.log('Switched to SET Mode');
     };
 
@@ -46,12 +49,12 @@ const BudgetSettings = () => {
 
         console.log('Budget Update - Mode:', mode);
         console.log('Raw Input:', localBudget);
-        console.log('Current Base Budget:', budget);
+        console.log('Current Personal Budget:', editableBudget);
 
         if (mode === 'add') {
-            // Calculate new total: Current Budget (Base) + Input Amount (Converted to Base)
+            // Calculate new total: Personal Budget (Base) + Input Amount (Converted to Base)
             const additionalAmountBase = toBaseCurrency(Number(localBudget));
-            finalBaseAmount = budget + additionalAmountBase;
+            finalBaseAmount = editableBudget + additionalAmountBase;
             console.log('Add Mode - Additional (Base):', additionalAmountBase);
         } else {
             // Set new total directly
@@ -182,7 +185,7 @@ const BudgetSettings = () => {
                                 <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted">{t('budget.current')}:</span>
-                                        <span className="text-main">{formatCurrency(budget)}</span>
+                                        <span className="text-main">{formatCurrency(editableBudget)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm mt-1">
                                         <span className="text-emerald-400">+ {t('budget.add')}:</span>
@@ -192,7 +195,7 @@ const BudgetSettings = () => {
                                     <div className="flex justify-between font-bold">
                                         <span className="text-indigo-300">{t('budget.newTotal')}:</span>
                                         <span className="text-indigo-300">
-                                            {formatCurrency(budget + toBaseCurrency(Number(localBudget)), true)}
+                                            {formatCurrency(editableBudget + toBaseCurrency(Number(localBudget)), true)}
                                         </span>
                                     </div>
                                 </div>
