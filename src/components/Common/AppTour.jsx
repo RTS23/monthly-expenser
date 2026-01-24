@@ -4,7 +4,7 @@ import { useSettings } from '../../contexts/SettingsContext';
 // Onboarding tour component - mobile optimized
 
 const AppTour = () => {
-    const { theme } = useSettings();
+    const { theme, t } = useSettings();
     const isDarkMode = theme === 'dark';
     const [run, setRun] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -35,19 +35,19 @@ const AppTour = () => {
     const mobileSteps = [
         {
             target: 'body',
-            content: '👋 Welcome! Tap the + button to add expenses.',
+            content: t('tour.mobile.step1'),
             placement: 'center',
             disableBeacon: true,
         },
         {
             target: 'body',
-            content: '📊 Your budget stats are at the top.',
+            content: t('tour.mobile.step2'),
             placement: 'center',
             disableBeacon: true,
         },
         {
             target: 'body',
-            content: '🔍 Use the search bar to filter. All done!',
+            content: t('tour.mobile.step3'),
             placement: 'center',
             disableBeacon: true,
         }
@@ -59,8 +59,8 @@ const AppTour = () => {
             target: 'body',
             content: (
                 <div>
-                    <strong>Welcome to Etoile! 👋</strong>
-                    <p style={{ marginTop: 8 }}>Let's take a quick tour.</p>
+                    <strong>{t('tour.welcome')}</strong>
+                    <p style={{ marginTop: 8 }}>{t('tour.intro')}</p>
                 </div>
             ),
             placement: 'center',
@@ -68,22 +68,22 @@ const AppTour = () => {
         },
         {
             target: '[data-tour="add-expense-btn"]',
-            content: '➕ Click here to add a new expense.',
+            content: t('tour.desktop.add'),
             placement: 'left',
         },
         {
             target: '[data-tour="dashboard-stats"]',
-            content: '📊 Your spending summary at a glance.',
+            content: t('tour.desktop.stats'),
             placement: 'bottom',
         },
         {
             target: '[data-tour="manage-budget-link"]',
-            content: '💰 Set your budget limits here.',
+            content: t('tour.desktop.budget'),
             placement: 'right',
         },
         {
             target: '[data-tour="filters"]',
-            content: '🔍 Search and filter expenses. All done!',
+            content: t('tour.desktop.filters'),
             placement: 'bottom',
         }
     ];

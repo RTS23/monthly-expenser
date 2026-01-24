@@ -124,5 +124,22 @@ export const en = {
     toasts: {
         budgetWarning: 'You have used 80% of your monthly budget.',
         budgetExceeded: 'You have exceeded your monthly budget!'
+    },
+
+    // App Tour
+    tour: {
+        welcome: 'Welcome to Etoile! 👋',
+        intro: "Let's take a quick tour.",
+        mobile: {
+            step1: '👋 Welcome! Tap the + button to add expenses.',
+            step2: '📊 Your budget stats are at the top.',
+            step3: '🔍 Use the search bar to filter. All done!'
+        },
+        desktop: {
+            add: '➕ Click here to add a new expense.',
+            stats: '📊 Your spending summary at a glance.',
+            budget: '💰 Set your budget limits here.',
+            filters: '🔍 Search and filter expenses. All done!'
+        }
     }
 };

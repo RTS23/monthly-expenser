@@ -124,5 +124,22 @@ export const id = {
     toasts: {
         budgetWarning: 'Kamu sudah menggunakan 80% anggaran bulan ini.',
         budgetExceeded: 'Kamu sudah melebihi anggaran bulan ini!'
+    },
+
+    // Tur Aplikasi
+    tour: {
+        welcome: 'Selamat Datang di Etoile! 👋',
+        intro: 'Mari ikuti tur singkat.',
+        mobile: {
+            step1: '👋 Halo! Tekan tombol + untuk catat pengeluaran.',
+            step2: '📊 Statistik anggaranmu ada di atas.',
+            step3: '🔍 Gunakan pencarian untuk filter. Selesai!'
+        },
+        desktop: {
+            add: '➕ Klik di sini untuk tambah pengeluaran.',
+            stats: '📊 Ringkasan pengeluaranmu sekilas.',
+            budget: '💰 Atur batas anggaranmu di sini.',
+            filters: '🔍 Cari dan filter pengeluaran. Selesai!'
+        }
     }
 };
