@@ -34,7 +34,7 @@ const Overview = () => {
                 </div>
                 <div className="relative z-10">
                     <h3 className="text-muted text-xs sm:text-sm font-medium mb-1">{t('dashboard.monthlyBudget')}</h3>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-main count-up break-words">{formatCurrency(budget)}</p>
+                    <p className="text-lg sm:text-xl font-bold tracking-tight text-main count-up break-words">{formatCurrency(budget)}</p>
                     <div className="mt-2 sm:mt-4 text-xs text-muted">
                         {t('dashboard.definedLimit')}
                     </div>
@@ -49,7 +49,7 @@ const Overview = () => {
                 </div>
                 <div className="relative z-10">
                     <h3 className="text-muted text-xs sm:text-sm font-medium mb-1">{t('dashboard.totalSpent')}</h3>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-main count-up break-words">{formatCurrency(totalSpent)}</p>
+                    <p className="text-lg sm:text-xl font-bold tracking-tight text-main count-up break-words">{formatCurrency(totalSpent)}</p>
                     <div className="mt-2 sm:mt-4 text-xs text-rose-300 flex items-center">
                         <TrendingDown size={14} className="mr-1" />
                         <span className={percentage >= 80 ? 'animate-pulse' : ''}>{percentage.toFixed(1)}% {t('dashboard.budgetUsed')}</span>
@@ -65,7 +65,7 @@ const Overview = () => {
                 </div>
                 <div className="relative z-10">
                     <h3 className="text-muted text-xs sm:text-sm font-medium mb-1">{t('dashboard.remaining')}</h3>
-                    <p className={`text-lg sm:text-xl md:text-2xl font-bold count-up break-words ${remaining < 0 ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`}>
+                    <p className={`text-lg sm:text-xl font-bold tracking-tight count-up break-words ${remaining < 0 ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`}>
                         {formatCurrency(remaining)}
                     </p>
 

@@ -12,8 +12,8 @@ const SavingsCard = () => {
 
     return (
         <div className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg ${isDark
-                ? 'bg-slate-800/50 border-slate-700/50'
-                : 'bg-white border-slate-200'
+            ? 'bg-slate-800/50 border-slate-700/50'
+            : 'bg-white border-slate-200'
             }`}>
             <div className="flex items-center gap-3 mb-4">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
@@ -31,7 +31,7 @@ const SavingsCard = () => {
             </div>
 
             <div className="flex items-baseline gap-2">
-                <h2 className={`text-3xl font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                <h2 className={`text-xl sm:text-2xl font-bold tracking-tight break-words ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
                     {formatCurrency(Math.abs(savings))}
                 </h2>
                 {!isPositive && (
