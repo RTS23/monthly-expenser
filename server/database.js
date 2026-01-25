@@ -214,6 +214,11 @@ export const getExpenseCount = async () => {
   return result.rows[0].count;
 };
 
+export const getExpenseDistribution = async () => {
+  const result = await execute('SELECT userId, COUNT(*) as count FROM expenses GROUP BY userId');
+  return result.rows;
+};
+
 export const updateBudgetAlert = async (userId, level, month) => {
   return await execute("UPDATE budgets SET lastAlertLevel = ?, lastAlertMonth = ? WHERE userId = ?", [level, month, userId]);
 };

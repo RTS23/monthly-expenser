@@ -9,7 +9,7 @@ import {
     getExpenses, addExpense, deleteExpense, updateExpense,
     getAllBudgets, updateUserBudget,
     getRecurringExpenses, addRecurringExpense, deleteRecurringExpense,
-    getDbMode, getExpenseCount,
+    getDbMode, getExpenseCount, getExpenseDistribution,
     getUserMonthlyBudgets, updateUserMonthlyBudget, updateBudgetAlert
 } from './database.js';
 import { startBot } from './bot.js';
@@ -28,6 +28,7 @@ app.get('/api/status', async (req, res) => {
         status: 'online',
         dbMode: getDbMode(),
         rowCount: await getExpenseCount(),
+        distribution: await getExpenseDistribution(),
         isProduction,
         timestamp: new Date().toISOString()
     });

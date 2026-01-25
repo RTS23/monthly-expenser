@@ -312,6 +312,21 @@ const BudgetSettings = () => {
                                 <p className="mt-1">Please set <code>TURSO_DATABASE_URL</code> in your Render Environment Variables.</p>
                             </div>
                         )}
+
+                        {/* Data Distribution Debug */}
+                        {dbStatus.distribution && dbStatus.distribution.length > 0 && (
+                            <div className="mt-3 border-t border-slate-700/50 pt-2">
+                                <p className="text-muted mb-1 font-semibold">Data Ownership:</p>
+                                <div className="space-y-1">
+                                    {dbStatus.distribution.map((d, i) => (
+                                        <div key={i} className="flex justify-between font-mono bg-slate-900/50 p-1.5 rounded">
+                                            <span className="truncate max-w-[150px]" title={d.userId}>{d.userId || 'NULL (Orphaned)'}</span>
+                                            <span>{d.count} items</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
