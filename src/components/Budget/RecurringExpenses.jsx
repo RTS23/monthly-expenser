@@ -18,6 +18,12 @@ const CategoryIcon = ({ category }) => {
     const Icon = icons[category] || MoreHorizontal;
 
     const colors = {
+        'Food': 'bg-orange-500/20 text-orange-400',
+        'Shopping': 'bg-pink-500/20 text-pink-400',
+        'Housing': 'bg-indigo-500/20 text-indigo-400',
+        'Transport': 'bg-blue-500/20 text-blue-400',
+        'Utilities': 'bg-yellow-500/20 text-yellow-400',
+        'Entertainment': 'bg-purple-500/20 text-purple-400',
         'Other': 'bg-slate-500/20 text-slate-400'
     };
 
@@ -43,7 +49,14 @@ const RecurringExpenses = () => {
     const { t, formatCurrency, theme, language, currency, toBaseCurrency } = useSettings(); // Added currency, toBaseCurrency
     const isDark = theme === 'dark';
 
-    // ...
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
+    const [formData, setFormData] = useState({
+        title: '',
+        amount: '',
+        category: 'Housing',
+        dayOfMonth: '1'
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();
