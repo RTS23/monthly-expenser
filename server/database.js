@@ -60,6 +60,15 @@ const initDb = async () => {
                 lastGeneratedDate TEXT DEFAULT NULL
             )
         `);
+
+    await execute(`
+            CREATE TABLE IF NOT EXISTS monthly_budgets (
+                userId TEXT NOT NULL,
+                month TEXT NOT NULL,
+                amount REAL NOT NULL,
+                PRIMARY KEY (userId, month)
+            )
+        `);
     console.log(`Database initialized using: ${url.startsWith("libsql") ? "Turso (Remote)" : "Local File (Ephemeral)"}`);
   } catch (e) {
     console.error("Failed to init database:", e);
