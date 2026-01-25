@@ -129,8 +129,12 @@ app.get('/api/expenses', isAuthenticated, async (req, res) => {
             res.json({ expenses, budgets });
         } else {
             // Fix: Use String conversion for robust ID comparison (handles DB Number vs Session String)
+            // Also include orphaned data (userId is null/undefined/empty)
             const userIdStr = String(req.user.id);
-            const userExpenses = expenses.filter(e => String(e.userId) === userIdStr);
+            const userExpenses = expenses.filter(e => {
+                const eUid = String(e.userId);
+                return eUid === userIdStr || !e.userId || eUid === 'null' || eUid === 'undefined';
+            });
             const userBudget = budgets.filter(b => String(b.userId) === userIdStr);
             const monthlyBudgets = await getUserMonthlyBudgets(req.user.id); // SQL handles types, hopefully
 
@@ -238,7 +242,10 @@ app.get('/api/recurring', isAuthenticated, async (req, res) => {
         if (req.user.isAdmin) {
             res.json(allRecurring);
         } else {
-            const userRecurring = allRecurring.filter(r => r.userId === req.user.id);
+            const userRecurring = allRecurring.filter(r => {
+                const rUid = String(r.userId);
+                return rUid === String(req.user.id) || !r.userId || rUid === 'null' || rUid === 'undefined';
+            });
             res.json(userRecurring);
         }
     } catch (error) {
