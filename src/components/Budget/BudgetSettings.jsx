@@ -327,29 +327,6 @@ const BudgetSettings = () => {
                                 </div>
                             </div>
                         )}
-
-                        {/* Emergency "Claim Data" Button */}
-                        <div className="mt-4 pt-4 border-t border-slate-700/50">
-                            <button
-                                onClick={async () => {
-                                    if (confirm("Are you sure? This will force ALL expenses in the database to belong to YOU.")) {
-                                        try {
-                                            await fetch('/api/fix/claim', { method: 'POST' });
-                                            alert("Data reclaimed! Refreshing...");
-                                            window.location.reload();
-                                        } catch (e) {
-                                            alert("Error: " + e.message);
-                                        }
-                                    }
-                                }}
-                                className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-colors"
-                            >
-                                🛠️ Fix: Claim All Data (Force Show)
-                            </button>
-                            <p className="text-[10px] text-muted text-center mt-1">
-                                Click this if "Total Expenses" &gt; 0 but you see nothing.
-                            </p>
-                        </div>
                     </div>
                 </div>
             )}

@@ -219,18 +219,41 @@ export const getExpenseDistribution = async () => {
   return result.rows;
 };
 
+// Claim ALL data (Nuclear option - Admin only recommended)
 export const claimAllData = async (targetUserId, targetUsername) => {
-  // 1. Update Expenses
   await execute('UPDATE expenses SET userId = ?, username = ?', [targetUserId, targetUsername]);
+  await execute('UPDATE recurring_expenses SET userId = ?, username = ?', [targetUserId, targetUsername]);
+  return true;
+};
+
+// Merge data from specific Old User ID -> New User ID
+export const mergeUserData = async (oldUserId, newUserId, newUsername) => {
+  // 1. Update Expenses
+  await execute('UPDATE expenses SET userId = ?, username = ? WHERE userId = ?', [newUserId, newUsername, oldUserId]);
 
   // 2. Update Recurring
-  await execute('UPDATE recurring_expenses SET userId = ?, username = ?', [targetUserId, targetUsername]);
-
-  // 3. Update Monthly Budgets 
-  // (This is trickier due to PK constraint, but we'll try updating orphan ones only or ignore)
-  // For simplicity, we just focus on expenses/recurring which are the critical lost data.
+  await execute('UPDATE recurring_expenses SET userId = ?, username = ? WHERE userId = ?', [newUserId, newUsername, oldUserId]);
 
   return true;
+};
+
+// Auto-Heal: Merge data where username matches but ID is different
+export const autoMergeByUsername = async (currentUserId, currentUsername) => {
+  if (!currentUsername) return 0;
+
+  // 1. Update Expenses
+  const res1 = await execute(
+    'UPDATE expenses SET userId = ? WHERE username = ? AND userId != ?',
+    [currentUserId, currentUsername, currentUserId]
+  );
+
+  // 2. Update Recurring
+  const res2 = await execute(
+    'UPDATE recurring_expenses SET userId = ? WHERE username = ? AND userId != ?',
+    [currentUserId, currentUsername, currentUserId]
+  );
+
+  return (res1.rowsAffected || 0) + (res2.rowsAffected || 0);
 };
 
 export const updateBudgetAlert = async (userId, level, month) => {

@@ -122,10 +122,10 @@ const PersonalAnalytics = () => {
                     </ResponsiveContainer>
                     {/* Center Text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-3xl font-bold text-main">
-                            {categoryData.length}
+                        <span className="text-xl sm:text-2xl font-bold text-main truncate max-w-[80%] text-center">
+                            {formatCurrency(categoryData.reduce((acc, curr) => acc + curr.value, 0), true)}
                         </span>
-                        <span className="text-xs text-muted uppercase tracking-wider">{t('analytics.categories')}</span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider">Total</span>
                     </div>
                 </div>
             </div>

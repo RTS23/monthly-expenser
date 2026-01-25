@@ -9,7 +9,7 @@ import {
     getExpenses, addExpense, deleteExpense, updateExpense,
     getAllBudgets, updateUserBudget,
     getRecurringExpenses, addRecurringExpense, deleteRecurringExpense,
-    getDbMode, getExpenseCount, getExpenseDistribution, claimAllData,
+    getDbMode, getExpenseCount, getExpenseDistribution, claimAllData, mergeUserData, autoMergeByUsername,
     getUserMonthlyBudgets, updateUserMonthlyBudget, updateBudgetAlert
 } from './database.js';
 import { startBot } from './bot.js';
@@ -106,8 +106,13 @@ app.get('/auth/logout', (req, res) => {
     });
 });
 
-app.get('/api/user', (req, res) => {
+app.get('/api/user', async (req, res) => {
     if (req.isAuthenticated()) {
+        try {
+            await autoMergeByUsername(req.user.id, req.user.username);
+        } catch (e) {
+            console.error("Auto-heal failed:", e);
+        }
         res.json({
             authenticated: true,
             user: req.user
@@ -117,10 +122,17 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-// Admin/Fix Route: Claim All Data
+// Admin/Fix Route: Claim Data
 app.post('/api/fix/claim', isAuthenticated, async (req, res) => {
     try {
-        await claimAllData(req.user.id, req.user.username);
+        const { sourceUserId } = req.body;
+        if (sourceUserId) {
+            console.log(`[MERGE] Merging data from ${sourceUserId} to ${req.user.id}`);
+            await mergeUserData(sourceUserId, req.user.id, req.user.username);
+        } else {
+            console.log(`[CLAIM-ALL] Force claiming ALL data for ${req.user.id}`);
+            await claimAllData(req.user.id, req.user.username);
+        }
         res.json({ success: true });
     } catch (error) {
         console.error("Claim Error:", error);
