@@ -9,7 +9,7 @@ import {
     getExpenses, addExpense, deleteExpense, updateExpense,
     getAllBudgets, updateUserBudget,
     getRecurringExpenses, addRecurringExpense, deleteRecurringExpense,
-    getDbMode,
+    getDbMode, getExpenseCount,
     getUserMonthlyBudgets, updateUserMonthlyBudget, updateBudgetAlert
 } from './database.js';
 import { startBot } from './bot.js';
@@ -23,10 +23,11 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Status Endpoint
-app.get('/api/status', (req, res) => {
+app.get('/api/status', async (req, res) => {
     res.json({
         status: 'online',
         dbMode: getDbMode(),
+        rowCount: await getExpenseCount(),
         isProduction,
         timestamp: new Date().toISOString()
     });

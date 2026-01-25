@@ -209,6 +209,11 @@ export const updateUserMonthlyBudget = async (userId, month, amount) => {
   }
 };
 
+export const getExpenseCount = async () => {
+  const result = await execute('SELECT COUNT(*) as count FROM expenses');
+  return result.rows[0].count;
+};
+
 export const updateBudgetAlert = async (userId, level, month) => {
   return await execute("UPDATE budgets SET lastAlertLevel = ?, lastAlertMonth = ? WHERE userId = ?", [level, month, userId]);
 };

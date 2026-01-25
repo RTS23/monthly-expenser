@@ -13,6 +13,22 @@ const BudgetSettings = () => {
     const [saved, setSaved] = useState(false);
     const [mode, setMode] = useState('set'); // 'set' or 'add'
     const [isMonthly, setIsMonthly] = useState(false); // Toggle for monthly override
+    const [dbStatus, setDbStatus] = useState(null);
+
+    useEffect(() => {
+        const fetchStatus = async () => {
+            try {
+                const res = await fetch('/api/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    setDbStatus(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch status:", error);
+            }
+        };
+        fetchStatus();
+    }, []);
 
     // Determine which budget we are actually editing
     const targetUsername = selectedUser || 'Admin';
@@ -266,6 +282,39 @@ const BudgetSettings = () => {
                     </form>
                 )}
             </div>
+
+            {/* System Status Section (Debug) */}
+            {dbStatus && (
+                <div className={`glass-panel p-4 rounded-xl max-w-xl mx-auto border transition-all ${dbStatus.dbMode === 'Turso' ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-red-500/30 bg-red-500/10'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className={`text-sm font-semibold ${dbStatus.dbMode === 'Turso' ? 'text-emerald-400' : 'text-red-400'}`}>
+                            System Status
+                        </h3>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${dbStatus.dbMode === 'Turso' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
+                            {dbStatus.dbMode}
+                        </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                        <div className="flex justify-between">
+                            <span className="text-muted">Database:</span>
+                            <span className="font-mono text-main">{dbStatus.dbMode === 'Turso' ? 'Remote (Persistent)' : 'Local File (Ephemeral)'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted">Total Expenses:</span>
+                            <span className="font-mono text-main">{dbStatus.rowCount}</span>
+                        </div>
+
+                        {dbStatus.dbMode !== 'Turso' && (
+                            <div className="mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-200">
+                                <p className="font-bold mb-1">⚠️ Warning: Data Loss Risk</p>
+                                <p>You are using a temporary local database. Data **will be deleted** when the server restarts (e.g., after being AFK).</p>
+                                <p className="mt-1">Please set <code>TURSO_DATABASE_URL</code> in your Render Environment Variables.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Budget History Section */}
             <div className="max-w-xl mx-auto">
