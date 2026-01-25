@@ -219,6 +219,20 @@ export const getExpenseDistribution = async () => {
   return result.rows;
 };
 
+export const claimAllData = async (targetUserId, targetUsername) => {
+  // 1. Update Expenses
+  await execute('UPDATE expenses SET userId = ?, username = ?', [targetUserId, targetUsername]);
+
+  // 2. Update Recurring
+  await execute('UPDATE recurring_expenses SET userId = ?, username = ?', [targetUserId, targetUsername]);
+
+  // 3. Update Monthly Budgets 
+  // (This is trickier due to PK constraint, but we'll try updating orphan ones only or ignore)
+  // For simplicity, we just focus on expenses/recurring which are the critical lost data.
+
+  return true;
+};
+
 export const updateBudgetAlert = async (userId, level, month) => {
   return await execute("UPDATE budgets SET lastAlertLevel = ?, lastAlertMonth = ? WHERE userId = ?", [level, month, userId]);
 };

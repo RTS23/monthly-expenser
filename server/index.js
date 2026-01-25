@@ -9,7 +9,7 @@ import {
     getExpenses, addExpense, deleteExpense, updateExpense,
     getAllBudgets, updateUserBudget,
     getRecurringExpenses, addRecurringExpense, deleteRecurringExpense,
-    getDbMode, getExpenseCount, getExpenseDistribution,
+    getDbMode, getExpenseCount, getExpenseDistribution, claimAllData,
     getUserMonthlyBudgets, updateUserMonthlyBudget, updateBudgetAlert
 } from './database.js';
 import { startBot } from './bot.js';
@@ -114,6 +114,17 @@ app.get('/api/user', (req, res) => {
         });
     } else {
         res.json({ authenticated: false });
+    }
+});
+
+// Admin/Fix Route: Claim All Data
+app.post('/api/fix/claim', isAuthenticated, async (req, res) => {
+    try {
+        await claimAllData(req.user.id, req.user.username);
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Claim Error:", error);
+        res.status(500).json({ error: error.message });
     }
 });
 
