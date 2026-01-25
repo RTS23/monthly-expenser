@@ -239,12 +239,12 @@ const UnifiedFilterBar = () => {
                                 <Calendar size={12} />
                                 {language === 'id' ? 'Rentang Tanggal' : 'Date Range'}
                             </label>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col xl:flex-row gap-2">
                                 <input
                                     type="date"
                                     value={dateRange?.start || ''}
                                     onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value, end: prev?.end || e.target.value }))}
-                                    className={`flex-1 px-2 py-2 rounded-lg border text-xs
+                                    className={`flex-1 px-2 py-2 rounded-lg border text-xs min-w-0
                                         ${isDark
                                             ? 'bg-slate-900/50 border-slate-700/50 text-white'
                                             : 'bg-white border-slate-200 text-slate-900'
@@ -255,7 +255,7 @@ const UnifiedFilterBar = () => {
                                     type="date"
                                     value={dateRange?.end || ''}
                                     onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value, start: prev?.start || e.target.value }))}
-                                    className={`flex-1 px-2 py-2 rounded-lg border text-xs
+                                    className={`flex-1 px-2 py-2 rounded-lg border text-xs min-w-0
                                         ${isDark
                                             ? 'bg-slate-900/50 border-slate-700/50 text-white'
                                             : 'bg-white border-slate-200 text-slate-900'
@@ -271,7 +271,7 @@ const UnifiedFilterBar = () => {
                                 <DollarSign size={12} />
                                 {language === 'id' ? 'Rentang Jumlah' : 'Amount Range'}
                             </label>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col xl:flex-row gap-2">
                                 <div className={`flex items-center flex-1 px-2 py-2 rounded-lg border text-xs
                                     ${isDark
                                         ? 'bg-slate-900/50 border-slate-700/50'
