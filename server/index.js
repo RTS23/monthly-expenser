@@ -332,4 +332,6 @@ app.post('/api/upload', upload.single('receipt'), (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
+    console.log(`Database Mode: ${getDbMode()}`);
+    console.log(`DB URL (masked): ${process.env.TURSO_DATABASE_URL ? process.env.TURSO_DATABASE_URL.replace(/:\/\/[^@]+@/, '://***@') : 'Local File'}`);
 });
