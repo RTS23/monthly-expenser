@@ -18,12 +18,6 @@ const CategoryIcon = ({ category }) => {
     const Icon = icons[category] || MoreHorizontal;
 
     const colors = {
-        'Food': 'bg-orange-500/20 text-orange-400',
-        'Shopping': 'bg-pink-500/20 text-pink-400',
-        'Housing': 'bg-indigo-500/20 text-indigo-400',
-        'Transport': 'bg-blue-500/20 text-blue-400',
-        'Utilities': 'bg-yellow-500/20 text-yellow-400',
-        'Entertainment': 'bg-purple-500/20 text-purple-400',
         'Other': 'bg-slate-500/20 text-slate-400'
     };
 
@@ -33,6 +27,16 @@ const CategoryIcon = ({ category }) => {
         </div>
     );
 };
+
+const CATEGORIES = [
+    { id: 'Food', label: 'Food' },
+    { id: 'Shopping', label: 'Shopping' },
+    { id: 'Housing', label: 'Housing' },
+    { id: 'Transport', label: 'Transport' },
+    { id: 'Utilities', label: 'Utilities' },
+    { id: 'Entertainment', label: 'Entertainment' },
+    { id: 'Other', label: 'Other' }
+];
 
 const RecurringExpenses = () => {
     const { recurringExpenses, addRecurringExpense, deleteRecurringExpense } = useExpenses();
@@ -215,7 +219,7 @@ const RecurringExpenses = () => {
                                         ${isDark ? 'border-slate-600 focus:border-indigo-500' : 'border-slate-300 focus:border-indigo-500'}
                                     `}
                                 >
-                                    {categories.map(c => (
+                                    {CATEGORIES.map(c => (
                                         <option key={c.id} value={c.id} className={isDark ? 'bg-slate-800' : 'bg-white'}>
                                             {t(`categories.${c.id}`) || c.label}
                                         </option>
